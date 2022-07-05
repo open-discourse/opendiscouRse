@@ -1,0 +1,6 @@
+^renv$
+^renv\.lock$
+^opendiscouRse\.Rproj$
+^\.Rproj\.user$
+^README\.Rmd$
+^LICENSE\.md$
