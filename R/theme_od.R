@@ -1,10 +1,9 @@
+#' ggplot2 theme for Open Discourse
+#'
+#' @return `ggplot2` theme
+#' @export
+#'
 theme_od <- function() {
-
-  # font <- "EB Garamond"
-  # font <- "CMU Serif"
-  # font <- "ComputerModern"
-  # font <- "Times"
-  # font <- "Source Sans Pro"
 
   sysfonts::font_add_google("Source Sans Pro", "ssp")
 
