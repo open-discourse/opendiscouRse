@@ -17,6 +17,8 @@ Depends:
 LazyData: true
 Imports: 
     dplyr,
+    ggplot2,
+    ggridges,
     magrittr,
     purrr,
     stringr
