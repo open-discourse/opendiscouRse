@@ -26,7 +26,7 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
   if (all(!class(date_hist) == "Date" | !class(date_birth) == "Date")) {
     stop("Select a valid variable of class 'Date'.")
   }
-  round(as.numeric(lp_start_date - date_birth) / 365, round_val)
+  round(as.numeric(date_hist - date_birth) / 365, round_val)
 }
 
 #' Get legislative periods where politicians make speeches.
