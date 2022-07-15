@@ -1,7 +1,8 @@
-#' Counting observations by grouping variables.
+#' Count observations by grouping variables.
 #'
 #' @importFrom magrittr %>%
 #'
+#' @param data Input data frame.
 #' @param grouping_vars A character vector containing grouping variables of a data table.
 #' @param sort_n_desc A boolean value indicating whether the whole data frame should be sorted in descending order by n. Default is `FALSE`.
 #'
@@ -43,6 +44,7 @@ count_data <- function(data, grouping_vars, sort_n_desc = FALSE) {
 #'
 #' @importFrom magrittr %>%
 #'
+#' @param data Input data frame.
 #' @param grouping_vars A character vector containing grouping variables of a data table.
 #' @param rel_freq_vars A character vector containing grouping variables of a data table that have to be part of argument `grouping_vars`.
 #' @param sort_n_desc A boolean value indicating whether the whole data frame should be sorted in descending order by n. Default is `FALSE`.
