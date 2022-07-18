@@ -31,13 +31,13 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
 
 #' Get legislative periods where politicians make speeches.
 #'
-#' @importFrom magrittr %>%
 #'
 #' @param data Input data frame.
 #' @param input_id Input politician id.
 #' @param output_format Format of output, either "data.frame" or "vector". Default is "data.frame".
 #'
 #' @return A data frame or (integer) vector.
+#' @importFrom magrittr %>%
 #' @export
 #'
 get_lps <- function(data, input_id, output_format = "data.frame") {
@@ -59,13 +59,12 @@ get_lps <- function(data, input_id, output_format = "data.frame") {
 
 #' Get professional group affiliation of politicians' jobs.
 #'
-#' @importFrom magrittr %>%
-#'
 #' @param data Input data frame.
 #' @param var Name of variable that contains the profession values.
 #' @param merge A boolean value indicating whether to return just the profession groups or the whole data frame. Default is `TRUE`.
 #'
 #' @return A data frame.
+#' @importFrom magrittr %>%
 #' @export
 #'
 get_profession_groups <- function(data, var, merge = TRUE) {
