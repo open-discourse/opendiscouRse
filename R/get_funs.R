@@ -57,6 +57,21 @@ get_lps <- function(data, input_id, output_format = "data.frame") {
   }
 }
 
+
+#' Generate dummy variables for profession variable.
+#'
+#' @param var Name of variable that contains the profession values.
+#' @param group_name Name of the profession group.
+#'
+#' @return
+#'
+.group_dummy_fun <- function(var, group_name) {
+  purrr::map_dbl(
+    stringr::str_to_lower(var),
+    ~ any(stringr::str_detect(., group_name))
+  )
+}
+
 #' Get professional group affiliation of politicians' jobs.
 #'
 #' @param data Input data frame.
@@ -74,17 +89,9 @@ get_profession_groups <- function(data, var, merge = TRUE) {
     names() %>%
     .[!(. == "sonstiges")]
 
-  # helper function
-  group_dummy_fun <- function(var_fun, group_name) {
-    purrr::map_dbl(
-      stringr::str_to_lower(var_fun),
-      ~ any(stringr::str_detect(., group_name))
-    )
-  }
-
   df <- map(
     jobs_names,
-    ~ group_dummy_fun(data %>% dplyr::pull(var) %>% stringr::str_to_lower(), .x)
+    ~ .group_dummy_fun(data %>% dplyr::pull(var) %>% stringr::str_to_lower(), .x)
   ) %>%
     dplyr::bind_cols() %>%
     suppressMessages() %>%
