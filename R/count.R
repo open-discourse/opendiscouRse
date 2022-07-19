@@ -5,19 +5,32 @@
 #' @param sort_n_desc A boolean value indicating whether the whole data frame should be sorted in descending order by n. Default is `FALSE`.
 #'
 #' @return A (grouped) data frame.
+#' @import checkmate
 #' @importFrom magrittr %>%
 #' @export
 #'
 count_data <- function(data, grouping_vars, sort_n_desc = FALSE) {
-  if (missing(grouping_vars)) {
-    stop("Indicate at least one variable for grouping data.")
-  }
-  if (!all(grouping_vars %in% colnames(data))) {
-    stop ("Select a set of grouping variables that exist in data.")
-  }
-  if (!all(grouping_vars %in% VALID_GROUP_VARS)) {
-    stop ("Select a set of valid grouping variables.")
-  }
+  assert_false(
+    is.null(grouping_vars)
+  )
+
+  purrr::map(
+    grouping_vars,
+    ~ assert(
+      check_character(data[[.x]]),
+      # check_date(data[[.x]]),
+      check_factor(data[[.x]]),
+      check_integerish(data[[.x]])
+    )
+  )
+
+  assert(
+    check_subset(
+      grouping_vars,
+      VALID_GROUP_VARS
+    )
+  )
+
   df <- data %>%
     dplyr::group_by(
       across(
@@ -25,6 +38,7 @@ count_data <- function(data, grouping_vars, sort_n_desc = FALSE) {
       )
     ) %>%
     dplyr::count()
+
   if (sort_n_desc == TRUE) {
     df %>%
       dplyr::ungroup() %>%
