@@ -4,12 +4,11 @@
 #' @param round_val Numeric value indicating how much the age should be rounded, default is 2.
 #'
 #' @return Current age of a politician (numeric).
+#' @import checkmate
 #' @export
 #'
 get_age <- function(date_birth, round_val = 2) {
-  if (!class(date_birth) == "Date") {
-    stop("Select a valid variable of class 'Date'.")
-  }
+  assert_date(date_birth)
   round(as.numeric(Sys.Date() - date_birth) / 365, round_val)
 }
 
@@ -20,12 +19,11 @@ get_age <- function(date_birth, round_val = 2) {
 #' @param round_val Numeric value indicating how much the age should be rounded, default is 2.
 #'
 #' @return Historic age of a politician based on a certain date, such as the starting date of a legislative period (numeric).
+#' @import checkmate
 #' @export
 #'
 get_age_hist <- function(date_hist, date_birth, round_val = 2) {
-  if (all(!class(date_hist) == "Date" | !class(date_birth) == "Date")) {
-    stop("Select a valid variable of class 'Date'.")
-  }
+  assert_date(date_hist, date_birth)
   round(as.numeric(date_hist - date_birth) / 365, round_val)
 }
 
