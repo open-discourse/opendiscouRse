@@ -61,28 +61,48 @@ count_data <- function(data, grouping_vars, sort_n_desc = FALSE) {
 #' @param sort_n_desc A boolean value indicating whether the whole data frame should be sorted in descending order by n. Default is `FALSE`.
 #'
 #' @return A (grouped) data frame.
+#' @import checkmate
 #' @importFrom magrittr %>%
 #' @export
 #'
 rel_freq_data <- function(data, grouping_vars, rel_freq_vars, sort_n_desc = FALSE) {
-  if (missing(grouping_vars)) {
-    stop("Indicate at least one variable for grouping data.")
-  }
-  else if (missing(rel_freq_vars)) {
-    stop("Indicate at least one variable for computing relative frequencies.")
-  }
-  if (!all(grouping_vars %in% colnames(data))) {
-    stop ("Select a set of grouping variables that exist in data.")
-  }
-  if (!all(grouping_vars %in% VALID_GROUP_VARS)) {
-    stop ("Select a set of valid grouping variables.")
-  }
-  if (!all(rel_freq_vars %in% grouping_vars)) {
-    stop ("Select a set of valid grouping variables for computing relative frequencies.")
-  }
-  if (grouping_vars == rel_freq_vars) {
-    warning("Same set of grouping variables is selected. Relative frequency is 1 respectively.")
-  }
+  assert_false(
+    is.null(grouping_vars)
+  )
+
+  assert_false(
+    is.null(rel_freq_vars)
+  )
+
+  purrr::map(
+    grouping_vars,
+    ~ assert(
+      check_character(data[[.x]]),
+      # check_date(data[[.x]]),
+      check_factor(data[[.x]]),
+      check_integerish(data[[.x]])
+    )
+  )
+
+  assert(
+    check_subset(
+      grouping_vars,
+      colnames(data)
+    ),
+    check_subset(
+      grouping_vars,
+      VALID_GROUP_VARS
+    ),
+    check_subset(
+      rel_freq_vars,
+      grouping_vars
+    )
+  )
+
+  assert_false(
+    grouping_vars == rel_freq_vars
+  )
+
   df <- data %>%
     dplyr::group_by(
       across(
@@ -98,6 +118,7 @@ rel_freq_data <- function(data, grouping_vars, rel_freq_vars, sort_n_desc = FALS
     dplyr::mutate(
       rel_freq = n / sum(n)
     )
+
   if (sort_n_desc == TRUE) {
     df %>%
       dplyr::ungroup() %>%
