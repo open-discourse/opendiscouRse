@@ -11,8 +11,7 @@ OData <- R6::R6Class(
   public = list(
     table_name = NULL,
     data = NULL,
-    #' Initialize OData Object
-    #'
+    #' @description constructor
     #' @param table_name (`character`) character string of the table name
     initialize = function(table_name = "factions") {
       stopifnot(is.character(table_name))

@@ -29,6 +29,7 @@ or summary functions.
 \if{html}{\out{<a id="method-new"></a>}}
 \if{latex}{\out{\hypertarget{method-new}{}}}
 \subsection{Method \code{new()}}{
+constructor
 \subsection{Usage}{
 \if{html}{\out{<div class="r">}}\preformatted{OData$new(table_name = "factions")}\if{html}{\out{</div>}}
 }
