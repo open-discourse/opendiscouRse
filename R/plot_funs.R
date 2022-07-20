@@ -10,6 +10,8 @@
 #' @export
 #'
 plot_dist <- function(data, metric_var, group_var, plot_type = "ridge_plot") {
+  check_data_frame(data)
+
   plot <- data %>%
     ggplot2::ggplot(
       ggplot2::aes(x = {{ metric_var }}, y = as.factor( {{ group_var }} ))
