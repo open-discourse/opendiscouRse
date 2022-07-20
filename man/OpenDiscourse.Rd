@@ -12,6 +12,7 @@ Open Discourse Connector
 \subsection{Public methods}{
 \itemize{
 \item \href{#method-new}{\code{OpenDiscourse$new()}}
+\item \href{#method-get_data}{\code{OpenDiscourse$get_data()}}
 \item \href{#method-clone}{\code{OpenDiscourse$clone()}}
 }
 }
@@ -31,9 +32,28 @@ constructor
 
 \item{\code{dataverse}}{(\code{logical}) Whether to retrieve data from the harvard
 data verse
-Connect to docker}
+Get Data from Database}
 }
 \if{html}{\out{</div>}}
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_data"></a>}}
+\if{latex}{\out{\hypertarget{method-get_data}{}}}
+\subsection{Method \code{get_data()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OpenDiscourse$get_data(table_name = "factions")}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{table_name}}{(\code{character}) character string of the table name}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+OData object
 }
 }
 \if{html}{\out{<hr>}}

@@ -13,39 +13,25 @@ OpenDiscourse <- R6::R6Class(
       docker_config = NULL,
       dataverse = FALSE) {
 
-       if(is.null(docker_config)) {
+      if(is.null(docker_config)) {
          print("No Docker config provided. Default is used.")
-         private$con = private$connect_to_docker(docker_config)
-       } else {
+       } else if(dataverse == FALSE) {
+        print("Not yet implemented")
        }
+      },
+    #' Get Data from Database
+    #'
+    #' @param table_name (`character`) character string of the table name
+    #'
+    #' @return OData object
+    #' @export
+    get_data = function(table_name = "factions") {
+
+      odata_obj <- OData$new(table_name)
+
+      od_data <- odata_obj$get_table_data()
+      return(od_data)
       }
-    ),
-  private = list(
-    con = NULL,
-    #' Connect to docker
-    #'
-    #' @param db (`character`) as used in `dbConnect`
-    #' @param host_db (`character`) as used in `dbConnect`
-    #' @param db_port (`character`) as used in `dbConnect`
-    #' @param db_user (`character`) as used in `dbConnect`
-    #' @param db_password (`character`) as used in `dbConnect`
-    #'
-    #' @return dbConnect connection object
-    connect_to_docker = function(db = "next",
-                                 host_db = "localhost",
-                                 db_port = "5432",
-                                 db_user = "postgres",
-                                 db_password = "postgres") {
-      con <- RPostgreSQL::dbConnect(
-        RPostgres::Postgres(),
-        dbname = db,
-        host = host_db,
-        port = db_port,
-        user = db_user,
-        password = db_password
-      )
-      return(con)
-    }
-  )
+    )
 )
 
