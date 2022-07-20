@@ -22,4 +22,5 @@ Imports:
     ggridges,
     magrittr,
     purrr,
+    rjson,
     stringr
