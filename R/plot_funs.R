@@ -18,7 +18,8 @@ plot_dist <- function(data, metric_var, group_var, plot_type = "ridge_plot") {
   plot <- data %>%
     ggplot2::ggplot(
       ggplot2::aes(x = {{ metric_var }}, y = as.factor( {{ group_var }} ))
-    )
+    ) +
+    ggplot2::labs(y = group_var)
   if (plot_type == "ridge_plot") {
     plot +
       ggridges::geom_density_ridges()
