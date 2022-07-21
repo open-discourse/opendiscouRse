@@ -10,11 +10,16 @@
 #' @export
 #'
 plot_dist <- function(data, metric_var, group_var, plot_type = "ridge_plot") {
+  check_data_frame(data)
+
+  metric_var <- rlang::sym(metric_var)
+  group_var <- rlang::sym(group_var)
+
   plot <- data %>%
     ggplot2::ggplot(
       ggplot2::aes(x = {{ metric_var }}, y = as.factor( {{ group_var }} ))
-      # aes(x = metric_var, y = as.factor(group_var))
-    )
+    ) +
+    ggplot2::labs(y = group_var)
   if (plot_type == "ridge_plot") {
     plot +
       ggridges::geom_density_ridges()

@@ -5,14 +5,15 @@
 #'
 theme_od <- function() {
 
-  sysfonts::font_add_google("Source Sans Pro", "ssp")
+  # sysfonts::font_add_google("Source Sans Pro", "ssp")
 
   # base theme
   ggplot2::theme_linedraw() %+replace%
 
     ggplot2::theme(
 
-      text = element_text(family = "ssp"),
+      # text = element_text(family = "ssp"),
+      text = element_text(family = "Times"),
       legend.text = element_text(size = 6),
       legend.title = element_blank(),
       legend.box.background = element_rect(colour = "black", fill = "white", linetype = "solid"),

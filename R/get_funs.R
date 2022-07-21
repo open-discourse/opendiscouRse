@@ -23,7 +23,10 @@ get_age <- function(date_birth, round_val = 2) {
 #' @export
 #'
 get_age_hist <- function(date_hist, date_birth, round_val = 2) {
-  assert_date(date_hist, date_birth)
+  assert(
+    check_date(date_hist),
+    check_date(date_birth)
+  )
   round(as.numeric(date_hist - date_birth) / 365, round_val)
 }
 
@@ -81,6 +84,8 @@ get_lps <- function(data, input_id, output_format = "data.frame") {
 #' @export
 #'
 get_profession_groups <- function(data, var, merge = TRUE) {
+  check_data_frame(data)
+
   jobs <- rjson::fromJSON(file = "data/jobs.json")
 
   jobs_names <- jobs %>%
