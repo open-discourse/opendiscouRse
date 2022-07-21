@@ -58,7 +58,6 @@ get_lps <- function(data, input_id, output_format = "data.frame") {
   }
 }
 
-
 #' Generate dummy variables for profession variable.
 #'
 #' @param var Name of variable that contains the profession values.
