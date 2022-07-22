@@ -11,6 +11,7 @@ OData <- R6::R6Class(
   public = list(
     table_name = NULL,
     data = NULL,
+    count_data = NULL,
     #' @description constructor
     #' @param table_name (`character`) character string of the table name
     initialize = function(table_name = "factions") {
@@ -57,6 +58,70 @@ OData <- R6::R6Class(
         )
 
         return(con)
+    },
+    #' Count observations by grouping variables.
+    #'
+    #' @param table_name (`character`) character string of the table name
+    #' @param grouping_vars A character vector containing grouping variables of a data table.
+    #' @param sort_n_desc A boolean value indicating whether the whole data frame should be sorted in descending order by n. Default is `FALSE`.
+    #'
+    #' @return A (grouped) data frame.
+    #' @import checkmate
+    #' @importFrom magrittr %>%
+    get_count = function(table_name = self$table_name,
+                          grouping_vars,
+                          sort_n_desc = FALSE) {
+
+      con <- self$get_con()
+
+      base_query <- DBI::sqlInterpolate(con,
+                                        "SELECT * FROM open_discourse.?table;",
+                                        table = DBI::SQL(table_name))
+
+      self$data <- RPostgres::dbGetQuery(con, base_query)
+
+      assert_false(
+        is.null(grouping_vars)
+      )
+
+      purrr::map(
+        grouping_vars,
+        ~ assert(
+          check_character(self$data[[.x]]),
+          # check_date(data[[.x]]),
+          check_factor(self$data[[.x]]),
+          check_integerish(self$data[[.x]])
+        )
+      )
+
+      assert(
+        check_subset(
+          grouping_vars,
+          VALID_GROUP_VARS
+        )
+      )
+
+      self$count_data <- self$data %>%
+        dplyr::group_by(
+          across(
+            {{ grouping_vars }}
+          )
+        ) %>%
+        dplyr::count()
+
+      if (sort_n_desc == TRUE) {
+        self$count_data <- self$count_data %>%
+          dplyr::ungroup() %>%
+          dplyr::arrange(
+            dplyr::desc(
+              n
+            )
+          )
+      }
+      else {
+        self$count_data
+      }
+      return(self)
     }
   )
 )
