@@ -1,6 +1,16 @@
 source("renv/activate.R")
 
-Sys.setenv(
+# VALID_GROUP_VARS <- c("session", "electoral_term", "test")
+
+# utils::globalVariables(
+#   "VALID_GROUP_VARS" <- c("session", "electoral_term", "test", "test2", "test3")
+# )
+
+# Sys.setenv(
+#   "VALID_GROUP_VARS" <- c("session", "electoral_term")
+# )
+
+options(
   "VALID_GROUP_VARS" <- c(
     # speeches
     "session",
@@ -20,4 +30,3 @@ Sys.setenv(
     "type"
   )
 )
-
