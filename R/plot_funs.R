@@ -9,7 +9,7 @@
 #' @importFrom magrittr %>%
 #' @export
 #'
-plot_dist <- function(data, metric_var, group_var, plot_type = "ridge_plot") {
+plot_dist <- function(data, metric_var, group_var, plot_type = "both") {
   check_data_frame(data)
 
   metric_var <- rlang::sym(metric_var)
@@ -20,7 +20,21 @@ plot_dist <- function(data, metric_var, group_var, plot_type = "ridge_plot") {
       ggplot2::aes(x = {{ metric_var }}, y = as.factor( {{ group_var }} ))
     ) +
     ggplot2::labs(y = group_var)
-  if (plot_type == "ridge_plot") {
+
+  if (plot_type == "both") {
+    width_val <- 1 / log2(
+      data %>%
+        dplyr::pull(group_var) %>%
+        as.factor() %>%
+        nlevels()
+    )
+    if (width_val > 0.4) {
+      width_val <- 0.4
+    }
+    plot +
+      ggridges::geom_density_ridges(scale = 0.75) +
+      ggplot2::geom_boxplot(width = width_val)
+  } else if (plot_type == "ridge_plot") {
     plot +
       ggridges::geom_density_ridges(scale = 0.75)
   } else if (plot_type == "box_plot") {
