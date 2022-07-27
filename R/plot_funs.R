@@ -3,7 +3,7 @@
 #' @param data Input data frame.
 #' @param metric_var Metric variable whose distribution is displayed.
 #' @param group_var Categorical variable that is used to group the metric variable visually.
-#' @param plot_type Type of plot, either "ridge_plot" or "box_plot". Default is "ridge_plot".
+#' @param plot_type Type of plot, either "both", "ridge_plot" or "box_plot". Default is "both" (Combine both plot types).
 #'
 #' @return A `ggplot` object.
 #' @importFrom magrittr %>%
