@@ -10,7 +10,7 @@
 #' @export
 #'
 plot_dist <- function(data, metric_var, group_var, plot_type = "both") {
-  check_data_frame(data)
+  checkmate::check_data_frame(data)
 
   metric_var <- rlang::sym(metric_var)
   group_var <- rlang::sym(group_var)
