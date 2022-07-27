@@ -22,7 +22,7 @@ plot_dist <- function(data, metric_var, group_var, plot_type = "ridge_plot") {
     ggplot2::labs(y = group_var)
   if (plot_type == "ridge_plot") {
     plot +
-      ggridges::geom_density_ridges()
+      ggridges::geom_density_ridges(scale = 0.75)
   } else if (plot_type == "box_plot") {
     plot +
       ggplot2::geom_boxplot()
