@@ -60,12 +60,13 @@ plot_cov <- function(data, group_var = NULL, exclude_vars = NULL) {
       tidyr::unnest() %>%
       suppressWarnings() %>%
       dplyr::mutate(dplyr::across(dplyr::everything(), ~ . / n)) %>%
+      dplyr::select(- n) %>%
       tidyr::pivot_longer(- {{ group_var }} )
 
     group_var <- rlang::sym(group_var)
 
     df %>%
-      ggplot2::ggplot(ggplot2::aes(x = name, y = {{ group_var }}, fill = value)) +
+      ggplot2::ggplot(ggplot2::aes(x = name, y = as.factor( {{ group_var }} ), fill = value)) +
       ggplot2::geom_tile(color = "black", lwd = 0.5) +
       ggplot2::scale_fill_continuous(
         name = "Percentage\nMissing",
