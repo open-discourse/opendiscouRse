@@ -68,6 +68,7 @@ plot_cov <- function(data, group_var = NULL, exclude_vars = NULL) {
     df %>%
       ggplot2::ggplot(ggplot2::aes(x = name, y = as.factor( {{ group_var }} ), fill = value)) +
       ggplot2::geom_tile(color = "black", lwd = 0.5) +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, hjust = 1)) +
       ggplot2::scale_fill_continuous(
         name = "Percentage\nMissing",
         low = "white",
