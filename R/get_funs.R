@@ -108,6 +108,14 @@ get_profession_groups <- function(data, var, merge = TRUE) {
 }
 
 
+#' Get data that is implausible based on specific data table based information.
+#'
+#' @param data Input data frame.
+#'
+#' @return A `data.frame`.
+#' @importFrom magrittr %>%
+#' @export
+#'
 get_implausible_data <- function(data) {
   checkmate::assert_data_frame(data)
 
