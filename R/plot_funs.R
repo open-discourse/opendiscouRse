@@ -29,7 +29,7 @@ plot_dist <- function(data, metric_var, group_var, plot_type = "ridge_plot") {
   }
 }
 
-plot_cov <- function(data, group_var = NULL, exclude_vars = NULL) {
+plot_cov <- function(data, group_var = NULL, exclude_vars = NULL, exclude_na_group = FALSE) {
   checkmate::check_data_frame(data)
 
   if (is.null(group_var)) {
@@ -50,9 +50,17 @@ plot_cov <- function(data, group_var = NULL, exclude_vars = NULL) {
       ) +
       ggplot2::labs(x = "", y = "")
   } else {
-    df <- data %>%
-      dplyr::select(-exclude_vars) %>%
-      dplyr::group_by(dplyr::across(group_var)) %>%
+    if (exclude_na_group == FALSE) {
+      df <- data %>%
+        dplyr::select(-exclude_vars) %>%
+        dplyr::group_by(dplyr::across(group_var))
+    } else {
+      df <- data %>%
+        dplyr::select(-exclude_vars) %>%
+        dplyr::filter(!is.na(!!rlang::sym(group_var))) %>%
+        dplyr::group_by(dplyr::across(group_var))
+    }
+    df <- df %>%
       tidyr::nest() %>%
       dplyr::mutate(
         n = purrr::map(data, ~ dplyr::count(.)) %>% unlist(),
