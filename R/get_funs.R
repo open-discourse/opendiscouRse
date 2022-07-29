@@ -83,7 +83,7 @@ get_lps <- function(data, input_id, output_format = "data.frame") {
 #' @export
 #'
 get_profession_groups <- function(data, var, merge = TRUE) {
-  check_data_frame(data)
+  checkmate::assert_data_frame(data)
 
   jobs <- rjson::fromJSON(file = "data/jobs.json")
 
@@ -108,4 +108,17 @@ get_profession_groups <- function(data, var, merge = TRUE) {
 }
 
 
+get_implausible_data <- function(data) {
+  checkmate::assert_data_frame(data)
+
+  if (deparse(substitute(data)) == "speeches") {
+    data %>%
+      dplyr::filter(position_short == "Member of Parliament") %>%
+      dplyr::filter(faction_id == -1)
+  } else if (deparse(substitute(data)) == "contributions_extended") {
+    data %>%
+      dplyr::filter(politician_id != -1) %>%
+      dplyr::filter(faction_id == -1)
+  }
+}
 
