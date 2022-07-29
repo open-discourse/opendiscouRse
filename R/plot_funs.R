@@ -1,9 +1,9 @@
 #' Plotting distributions by group variables.
 #'
 #' @param data Input data frame.
-#' @param metric_var Metric variable whose distribution is displayed.
-#' @param group_var Categorical variable that is used to group the metric variable visually.
-#' @param plot_type Type of plot, either "ridge_plot" or "box_plot". Default is "ridge_plot".
+#' @param metric_var `character` indicating metric variable whose distribution is displayed.
+#' @param group_var `character` indicating categorical variable that is used to group the metric variable visually.
+#' @param plot_type `character` indicating type of plot, either "ridge_plot" or "box_plot". Default is "ridge_plot".
 #'
 #' @return A `ggplot` object.
 #' @importFrom magrittr %>%
@@ -29,6 +29,18 @@ plot_dist <- function(data, metric_var, group_var, plot_type = "ridge_plot") {
   }
 }
 
+
+#' Plotting coverage (`NA`s) of data tables.
+#'
+#' @param data Input data frame.
+#' @param group_var `character` indicating categorical variable that is used to group the data before plotting.
+#' @param exclude_vars `character` indicating which variable(s) should be excluded from the data before plotting.
+#' @param exclude_na_group `character` indicating whether to include or exclude potential `NA`s in the grouping variable. Default is `FALSE`.
+#'
+#' @return A `ggplot` object.
+#' @importFrom magrittr %>%
+#' @export
+#'
 plot_cov <- function(data, group_var = NULL, exclude_vars = NULL, exclude_na_group = FALSE) {
   checkmate::check_data_frame(data)
 
