@@ -100,7 +100,7 @@ rel_freq_data <- function(data, grouping_vars, rel_freq_vars, sort_n_desc = FALS
   )
 
   assert_false(
-    grouping_vars == rel_freq_vars
+    all(grouping_vars == rel_freq_vars)
   )
 
   df <- data %>%
