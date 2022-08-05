@@ -93,7 +93,7 @@ OData <- R6::R6Class(
           )
         ) %>%
         dplyr::count() %>%
-        ungroup()
+        dplyr::ungroup()
 
       if (sort_n_desc == TRUE) {
         self$count_data <- self$count_data %>%
