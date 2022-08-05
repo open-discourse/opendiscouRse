@@ -32,7 +32,6 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
 
 #' Get legislative periods where politicians make speeches.
 #'
-#'
 #' @param data Input data frame.
 #' @param input_id Input politician id.
 #' @param output_format Format of output, either "data.frame" or "vector". Default is "data.frame".
@@ -107,5 +106,109 @@ get_profession_groups <- function(data, var, merge = TRUE) {
   }
 }
 
+get_state <- function(politician_id, electoral_term) {
+  url <- "https://www.bundestag.de/resource/blob/472878/4b9303987cc0520ed0d56b7a0311930a/MdB-Stammdaten-data.zip"
+  temp <- tempfile()
+  download.file(url, temp, quiet = TRUE)
+  stammdaten <- xml2::read_xml(unz(temp, "MDB_STAMMDATEN.XML"))
+  unlink(temp)
 
+  blnd_mapping <- c("BAD" = "Baden-Württemberg",
+                    "BAY" = "Bayern",
+                    "BB" = "Brandenburg",
+                    "BE" = "Berlin",
+                    "BLN" = "Berlin",
+                    "BRA" = "Brandenburg",
+                    "BRE" = "Bremen",
+                    "BW" = "Baden-Württemberg",
+                    "BWG" = "Baden-Württemberg",
+                    "BY" = "Bayern",
+                    "HB" = "Bremen", # changed
+                    "HBG" = "Hamburg",
+                    "HE" = "Hessen",
+                    "HES" = "Hessen",
+                    "HH" = "Hamburg",
+                    "MBV" = "Mecklenburg-Vorpommern",
+                    "MV" = "Mecklenburg-Vorpommern",
+                    "NDS" = "Niedersachsen",
+                    "NI" = "Niedersachsen",
+                    "NRW" = "Nordrhein-Westfalen",
+                    "NW" = "Nordrhein-Westfalen",
+                    "RP" = "Rheinland-Pfalz",
+                    "RPF" = "Rheinland-Pfalz",
+                    "SAA" = "Sachsen-Anhalt",
+                    "SAC" = "Sachsen",
+                    "SH" = "Schleswig-Holstein",
+                    "SL" = "Saarland",
+                    "SLD" = "Saarland",
+                    "SN" = "Sachsen",
+                    "ST" = "Sachsen-Anhalt",
+                    "SWH" = "Schleswig-Holstein",
+                    "TH" = "Thüringen",
+                    "THÜ" =  "Thüringen",
+                    "WBB" = "Baden-Württemberg",
+                    "WBH" = "Baden-Württemberg") %>%
+    tibble::tibble(abbr = names(.), name = .)
+
+  id_col <- rep(
+    stammdaten %>%
+      xml_find_all("//MDB/ID") %>%
+      xml_text(),
+    stammdaten %>%
+      xml_find_all("//MDB/WAHLPERIODEN") %>%
+      xml_length()
+  ) %>%
+    as_tibble_col("id")
+
+  wkr_land_col <- stammdaten %>%
+    xml_find_all(".//WKR_LAND") %>%
+    xml_text() %>%
+    as_tibble_col("WKR_LAND")
+
+  liste_col <- stammdaten %>%
+    xml_find_all(".//LISTE") %>%
+    xml_text() %>%
+    as_tibble_col("LISTE")
+
+  wp_col <- stammdaten %>%
+    xml_find_all(".//WP") %>%
+    xml_text() %>%
+    as_tibble_col("WP")
+
+  df <- tibble(id_col, wp_col, wkr_land_col, liste_col) %>%
+    mutate(
+      across(
+        c(WKR_LAND, LISTE),
+        ~ case_when(
+          . == "" ~ NA_character_,
+          str_detect(., "\\*") ~ NA_character_,
+          TRUE ~ .
+        )
+      ),
+      state = case_when(
+        !is.na(WKR_LAND) ~ WKR_LAND,
+        !is.na(LISTE) ~ LISTE,
+        TRUE ~ NA_character_
+      )
+    )
+
+  # return_vector <- function() {
+
+  if (all(is.na(politician_id))) {
+    return(NA_character_)
+  } else if (all(is.na(electoral_term))) {
+    return(NA_character_)
+  } else {
+    df %>%
+      filter(id == politician_id, WP == electoral_term) %>%
+      pull(state)
+  }
+
+  # }
+
+  # return_vector()
+
+  ## !!! ## ADD: LISTE Besonderheiten: Ausnahmen: * Eingliederung Saarland, ** Berlin West Änderungsgesetz, *** von der Volkskammer gewählt
+
+}
 
