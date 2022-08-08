@@ -108,10 +108,10 @@ get_profession_groups <- function(data, var, merge = TRUE) {
 
 #' Get state affiliation of elected politician (either list or direct mandate).
 #'
-#' @param politician_id
-#' @param electoral_term
+#' @param politician_id A `character` vector containing the politician ID values.
+#' @param electoral_term A `character` vector containing the electoral term values (number of the legislative period).
 #'
-#' @return
+#' @return An object of type `character`.
 #' @importFrom magrittr %>%
 #' @export
 #'
