@@ -107,6 +107,9 @@ get_profession_groups <- function(data, var, merge = TRUE) {
 }
 
 get_state <- function(politician_id, electoral_term) {
+  checkmate::assert_character(politician_id)
+  checkmate::assert_character(electoral_term)
+
   url <- "https://www.bundestag.de/resource/blob/472878/4b9303987cc0520ed0d56b7a0311930a/MdB-Stammdaten-data.zip"
   temp <- tempfile()
   download.file(url, temp, quiet = TRUE)
@@ -152,7 +155,7 @@ get_state <- function(politician_id, electoral_term) {
 
   id_col <- rep(
     stammdaten %>%
-      xml_find_all("//MDB/ID") %>%
+      xml2::xml_find_all("//MDB/ID") %>%
       xml_text(),
     stammdaten %>%
       xml_find_all("//MDB/WAHLPERIODEN") %>%
@@ -175,13 +178,18 @@ get_state <- function(politician_id, electoral_term) {
     xml_text() %>%
     as_tibble_col("WP")
 
+
+
   df <- tibble(id_col, wp_col, wkr_land_col, liste_col) %>%
     mutate(
+      volkskammer_dummy = ifelse(str_detect(LISTE, "\\*\\*\\*"), 1, 0),
       across(
         c(WKR_LAND, LISTE),
         ~ case_when(
           . == "" ~ NA_character_,
-          str_detect(., "\\*") ~ NA_character_,
+          str_detect(., "\\*\\*\\*") ~ NA_character_,
+          str_detect(., "\\*\\*") ~ "BLN",
+          str_detect(., "\\*") ~ "SLD",
           TRUE ~ .
         )
       ),
@@ -190,25 +198,24 @@ get_state <- function(politician_id, electoral_term) {
         !is.na(LISTE) ~ LISTE,
         TRUE ~ NA_character_
       )
-    )
+    ) %>%
+    left_join(blnd_mapping, by = c("state" = "abbr"))
 
-  # return_vector <- function() {
+  check_volkskammer <- df$volkskammer_dummy[match(
+    paste0(politician_id, "_", electoral_term),
+    df %>% transmute(paste0(id, "_", WP)) %>% pull
+  )]
 
-  if (all(is.na(politician_id))) {
-    return(NA_character_)
-  } else if (all(is.na(electoral_term))) {
-    return(NA_character_)
-  } else {
-    df %>%
-      filter(id == politician_id, WP == electoral_term) %>%
-      pull(state)
+  if (!is.null(check_volkskammer)) {
+    if (any(check_volkskammer == 1)) {
+      warning('NA values are generated for observations that are labelled with "von der Volkskammer gewählt".')
+    }
   }
 
-  # }
-
-  # return_vector()
-
-  ## !!! ## ADD: LISTE Besonderheiten: Ausnahmen: * Eingliederung Saarland, ** Berlin West Änderungsgesetz, *** von der Volkskammer gewählt
+  df$name[match(
+    paste0(politician_id, "_", electoral_term),
+    df %>% transmute(paste0(id, "_", WP)) %>% pull
+  )]
 
 }
 
