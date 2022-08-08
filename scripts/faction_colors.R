@@ -1,5 +1,5 @@
 library(tidyverse)
-library(partycoloR) # devtools::install_github("lwarode/partycoloR")
+# library(partycoloR) # devtools::install_github("lwarode/partycoloR")
 
 # get data ----------------------------------------------------------------
 factions <- readRDS("data/factions.RDS")
@@ -9,17 +9,17 @@ factions <- readRDS("data/factions.RDS")
 faction_colors_fun <- function() {
   # URL list of Wikipedia party articles
   wikipedia_raw <- read_csv("https://raw.githubusercontent.com/hdigital/partyfactsdata/master/import/wikipedia/wikipedia.csv")
-  
+
   # DEU subset
   wikipedia_de <- wikipedia_raw %>%
     filter(country == "DEU")
-  
+
   # URL list
   wikipedia_de_url_list <- as.list(wikipedia_de$url)
-  
+
   # applying partycoloR::wikipedia_party_color()
   party_de_color <- wikipedia_party_color(wikipedia_de_url_list)
-  
+
   # wrangling data
   party_de_color_link <- wikipedia_de %>%
     left_join(party_de_color, by = "url") %>%
@@ -29,8 +29,8 @@ faction_colors_fun <- function() {
       name_short %in% c("CDU", "DIE/LINKE") ~ color_2,
       name_short == "NPD" ~ color_4,
       TRUE ~ color_1)
-    ) %>% 
-    right_join(factions, by = c("name_short" = "abbreviation")) 
+    ) %>%
+    right_join(factions, by = c("name_short" = "abbreviation"))
 }
 
 faction_colors <- faction_colors_fun()

@@ -11,6 +11,7 @@ OData <- R6::R6Class(
   public = list(
     table_name = NULL,
     data = NULL,
+    count_data = NULL,
     #' @description constructor
     #' @param table_name (`character`) character string of the table name
     initialize = function(table_name = "factions") {
@@ -22,7 +23,6 @@ OData <- R6::R6Class(
     #' @description Retrieve Data from OD DB and keep it as data
     #' @param table_name (`character`) character string of the table name
     get_table_data = function(table_name = self$table_name) {
-
       con <- self$get_con()
 
       base_query <- DBI::sqlInterpolate(con,
@@ -57,6 +57,74 @@ OData <- R6::R6Class(
         )
 
         return(con)
+    },
+    #' Count observations by grouping variables.
+    #'
+    #' @param table_name (`character`) character string of the table name
+    #' @param grouping_vars A character vector containing grouping variables of a data table.
+    #' @param sort_n_desc A boolean value indicating whether the whole data frame should be 
+    #' sorted in descending order by n. Default is `FALSE`.
+    #'
+    #' @return A (grouped) data frame.
+    #' @import checkmate
+    #' @importFrom magrittr %>%
+    get_count = function(grouping_vars,
+                         sort_n_desc = FALSE) {
+
+      assert_false(
+        is.null(grouping_vars)
+      )
+
+      assert(
+        check_subset(
+          self$table_name,
+          names(private$valid_grouping_vars)
+        ),
+        check_subset(
+          grouping_vars,
+          private$valid_grouping_vars[[private$table_name]]
+        )
+      )
+
+      self$count_data <- self$data %>%
+        dplyr::group_by(
+          across(
+            {{ grouping_vars }}
+          )
+        ) %>%
+        dplyr::count() %>%
+        dplyr::ungroup()
+
+      if (sort_n_desc == TRUE) {
+        self$count_data <- self$count_data %>%
+          dplyr::ungroup() %>%
+          dplyr::arrange(
+            dplyr::desc(
+              n
+            )
+          )
+      }
+      return(self$count_data)
+      invisible(self)
     }
+  ),
+  private = list(
+    # this list defines the valid grouping variables that can be used
+    # for the get_count function
+    valid_grouping_vars = list(
+      speeches = c("session",
+        "electoral_term",
+        "politician_id",
+        "faction_id",
+        "position_short",
+        "position_long",
+        "date"),
+      politicians = c("birth_place",
+        "birth_country",
+        "gender",
+        "aristocracy"),
+      contributions = c("speech_id",
+        "type")
+    )
   )
 )
