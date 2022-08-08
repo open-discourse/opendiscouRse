@@ -106,6 +106,15 @@ get_profession_groups <- function(data, var, merge = TRUE) {
   }
 }
 
+#' Get state affiliation of elected politician (either list or direct mandate).
+#'
+#' @param politician_id
+#' @param electoral_term
+#'
+#' @return
+#' @importFrom magrittr %>%
+#' @export
+#'
 get_state <- function(politician_id, electoral_term) {
   checkmate::assert_character(politician_id)
   checkmate::assert_character(electoral_term)
@@ -156,55 +165,55 @@ get_state <- function(politician_id, electoral_term) {
   id_col <- rep(
     stammdaten %>%
       xml2::xml_find_all("//MDB/ID") %>%
-      xml_text(),
+      xml2::xml_text(),
     stammdaten %>%
-      xml_find_all("//MDB/WAHLPERIODEN") %>%
-      xml_length()
+      xml2::xml_find_all("//MDB/WAHLPERIODEN") %>%
+      xml2::xml_length()
   ) %>%
-    as_tibble_col("id")
+    tibble::as_tibble_col("id")
 
   wkr_land_col <- stammdaten %>%
-    xml_find_all(".//WKR_LAND") %>%
-    xml_text() %>%
-    as_tibble_col("WKR_LAND")
+    xml2::xml_find_all(".//WKR_LAND") %>%
+    xml2::xml_text() %>%
+    tibble::as_tibble_col("WKR_LAND")
 
   liste_col <- stammdaten %>%
-    xml_find_all(".//LISTE") %>%
-    xml_text() %>%
-    as_tibble_col("LISTE")
+    xml2::xml_find_all(".//LISTE") %>%
+    xml2::xml_text() %>%
+    tibble::as_tibble_col("LISTE")
 
   wp_col <- stammdaten %>%
-    xml_find_all(".//WP") %>%
-    xml_text() %>%
-    as_tibble_col("WP")
-
-
+    xml2::xml_find_all(".//WP") %>%
+    xml2::xml_text() %>%
+    tibble::as_tibble_col("WP")
 
   df <- tibble(id_col, wp_col, wkr_land_col, liste_col) %>%
-    mutate(
-      volkskammer_dummy = ifelse(str_detect(LISTE, "\\*\\*\\*"), 1, 0),
-      across(
+    dplyr::mutate(
+      volkskammer_dummy = ifelse(stringr::str_detect(LISTE, "\\*\\*\\*"), 1, 0),
+      dplyr::across(
         c(WKR_LAND, LISTE),
-        ~ case_when(
+        ~ dplyr::case_when(
           . == "" ~ NA_character_,
-          str_detect(., "\\*\\*\\*") ~ NA_character_,
-          str_detect(., "\\*\\*") ~ "BLN",
-          str_detect(., "\\*") ~ "SLD",
+          stringr::str_detect(., "\\*\\*\\*") ~ NA_character_,
+          stringr::str_detect(., "\\*\\*") ~ "BLN",
+          stringr::str_detect(., "\\*") ~ "SLD",
           TRUE ~ .
         )
       ),
-      state = case_when(
+      state = dplyr::case_when(
         !is.na(WKR_LAND) ~ WKR_LAND,
         !is.na(LISTE) ~ LISTE,
         TRUE ~ NA_character_
       )
     ) %>%
-    left_join(blnd_mapping, by = c("state" = "abbr"))
+    dplyr::left_join(blnd_mapping, by = c("state" = "abbr"))
 
   check_volkskammer <- df$volkskammer_dummy[match(
     paste0(politician_id, "_", electoral_term),
-    df %>% transmute(paste0(id, "_", WP)) %>% pull
+    df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
   )]
+
+  check_volkskammer[is.na(check_volkskammer)] <- 0
 
   if (!is.null(check_volkskammer)) {
     if (any(check_volkskammer == 1)) {
@@ -214,7 +223,7 @@ get_state <- function(politician_id, electoral_term) {
 
   df$name[match(
     paste0(politician_id, "_", electoral_term),
-    df %>% transmute(paste0(id, "_", WP)) %>% pull
+    df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
   )]
 
 }
