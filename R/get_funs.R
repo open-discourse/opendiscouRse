@@ -50,8 +50,8 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
 #'
 #' @param data Input `data.frame`.
 #' @param var Name of variable (`character`) that contains the electoral term values.
-#' @param dummy
-#' @param merge
+#' @param dummy A `logical` value indicating whether to generate dummy variables per electoral term (`TRUE`) or a single `list` variable. Default is `TRUE`.
+#' @param merge A `logical` value indicating whether to return just the generated columns (`FALSE`) or the whole `data.frame` (`TRUE`). Default is `TRUE`.
 #'
 #' @return A `data.frame`.
 #' @importFrom magrittr %>%
