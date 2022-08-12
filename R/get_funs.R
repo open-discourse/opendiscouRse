@@ -107,5 +107,21 @@ get_profession_groups <- function(data, var, merge = TRUE) {
   }
 }
 
+#' Get colors of factions.
+#'
+#' @param id A `character` indicating the ID of the faction.
+#'
+#' @return A (named) `character` yielding a hexadecimal color code.
+#' @importFrom magrittr %>%
+#' @export
+#'
+get_faction_colors <- function(id) {
+  faction_colors <- readr::read_csv("data/faction_colors.csv") %>%
+    suppressMessages()
 
+  colors <- faction_colors %>% dplyr::pull(hex_color_code)
+  names(colors) <- faction_colors %>% dplyr::pull(faction_id)
+
+  colors[as.character(id)]
+}
 
