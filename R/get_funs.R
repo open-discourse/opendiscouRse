@@ -107,5 +107,59 @@ get_profession_groups <- function(data, var, merge = TRUE) {
   }
 }
 
+get_table_1 <- function(table_speeches, table_contributions, output_format = "data.frame") {
+  checkmate::assert_data_frame(table_speeches)
+  checkmate::assert_data_frame(table_contributions)
+
+  min_date <- table_speeches %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::filter(date == min(date)) %>%
+    dplyr::distinct(electoral_term, date) %>%
+    dplyr::rename(`Earliest Date` = date)
+
+  max_date <- table_speeches %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::filter(date == max(date)) %>%
+    dplyr::distinct(electoral_term, date) %>%
+    dplyr::rename(`Latest Date` = date)
+
+  sessions_count <- table_speeches %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::distinct(session) %>%
+    dplyr::count() %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Sessions Count` = n,
+      `Cumulated Sessions Count` = cum_sum_n
+    )
+
+  speeches_count <- table_speeches %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::count() %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Speeches Count` = n,
+      `Cumulated Speeches Count` = cum_sum_n
+    )
+
+  tokens_count <- table_speeches %>%
+    tidytext::unnest_tokens(word, speech_content) %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::count() %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Tokens Count` = n,
+      `Cumulated Tokens Count` = cum_sum_n
+    )
+
+  contrib_et <- table_speeches %>%
+    dplyr::select(id, electoral_term, date) %>%
+    dplyr::right_join(table_contributions, by = c("id" = "speech_id"))
+
+}
+
 
 
