@@ -115,13 +115,15 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
     dplyr::group_by(electoral_term) %>%
     dplyr::filter(date == min(date)) %>%
     dplyr::distinct(electoral_term, date) %>%
-    dplyr::rename(`Earliest Date` = date)
+    dplyr::rename(`Earliest Date` = date) %>%
+    dplyr::ungroup()
 
   max_date <- table_speeches %>%
     dplyr::group_by(electoral_term) %>%
     dplyr::filter(date == max(date)) %>%
     dplyr::distinct(electoral_term, date) %>%
-    dplyr::rename(`Latest Date` = date)
+    dplyr::rename(`Latest Date` = date) %>%
+    dplyr::ungroup()
 
   sessions_count <- table_speeches %>%
     dplyr::group_by(electoral_term) %>%
@@ -145,9 +147,9 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
     )
 
   tokens_count <- table_speeches %>%
-    tidytext::unnest_tokens(word, speech_content) %>%
+    dplyr::mutate(n_tokens = str_count(speech_content, "\\w+")) %>%
     dplyr::group_by(electoral_term) %>%
-    dplyr::count() %>%
+    dplyr::summarise(n = sum(n_tokens)) %>%
     dplyr::ungroup() %>%
     dplyr::mutate(cum_sum_n = cumsum(n)) %>%
     dplyr::rename(
@@ -159,6 +161,59 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
     dplyr::select(id, electoral_term, date) %>%
     dplyr::right_join(table_contributions, by = c("id" = "speech_id"))
 
+  contributions_count <- contrib_et %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::count() %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Contributions Count` = n,
+      `Cumulated Contributions Count` = cum_sum_n
+    )
+
+  tokens_contributions_count <- contrib_et %>%
+    dplyr::mutate(n_tokens = str_count(content, "\\w+")) %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::summarise(n = sum(n_tokens)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Tokens Count` = n,
+      `Cumulated Tokens Count` = cum_sum_n
+    )
+
+  df <- purrr::reduce(
+    list(
+      min_date,
+      max_date,
+      sessions_count,
+      speeches_count,
+      tokens_count,
+      contributions_count,
+      tokens_contributions_count
+    ),
+    left_join
+  ) %>%
+    suppressMessages() %>%
+    dplyr::rename(`Electoral Term` = electoral_term)
+
+  options(OutDec = ".")
+
+  if (output_format == "data.frame") {
+    df
+  } else if (output_format == "latex") {
+    df %>%
+      mutate(
+        across(
+        4:dplyr::last_col(),
+        ~ scales::number(.x, big.mark = ".", decimal.mark = " ")
+        )
+      ) %>%
+      knitr::kable(booktabs = T, format = "latex") %>%
+      kableExtra::kable_styling(full_width = F, position = "left", latex_options = "scale_down") %>%
+      kableExtra::row_spec(0, align = "c", bold = T) %>%
+      kableExtra::column_spec(1, bold = T)
+  }
 }
 
 
