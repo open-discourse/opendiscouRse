@@ -197,8 +197,6 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
     suppressMessages() %>%
     dplyr::rename(`Electoral Term` = electoral_term)
 
-  options(OutDec = ".")
-
   if (output_format == "data.frame") {
     df
   } else if (output_format == "latex") {
