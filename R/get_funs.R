@@ -107,6 +107,15 @@ get_profession_groups <- function(data, var, merge = TRUE) {
   }
 }
 
+#' Get main table ("Table 1") with descriptive summaries of the database.
+#'
+#' @param table_speeches A `data.frame` object, indicating the `speeches` table.
+#' @param table_contributions  A `data.frame` object, indicating the `contributions_simplified` table.
+#' @param output_format A `character`, either `"data.frame"` or `"latex"`, indicating the output format. Default is `"data.frame"`.
+#'
+#' @return Either a `data.frame` (default), or `LaTeX` table code.
+#' @export
+#'
 get_table_1 <- function(table_speeches, table_contributions, output_format = "data.frame") {
   checkmate::assert_data_frame(table_speeches)
   checkmate::assert_data_frame(table_contributions)
@@ -207,7 +216,7 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
         ~ scales::number(.x, big.mark = ".", decimal.mark = " ")
         )
       ) %>%
-      knitr::kable(booktabs = T, format = "latex") %>%
+      knitr::kable(booktabs = T, format = "latex", col.names = linebreak) %>%
       kableExtra::kable_styling(full_width = F, position = "left", latex_options = "scale_down") %>%
       kableExtra::row_spec(0, align = "c", bold = T) %>%
       kableExtra::column_spec(1, bold = T)
