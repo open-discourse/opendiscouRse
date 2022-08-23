@@ -114,6 +114,7 @@ get_profession_groups <- function(data, var, merge = TRUE) {
 #' @param output_format A `character`, either `"data.frame"` or `"latex"`, indicating the output format. Default is `"data.frame"`.
 #'
 #' @return Either a `data.frame` (default), or `LaTeX` table code.
+#' @importFrom magrittr %>%
 #' @export
 #'
 get_table_1 <- function(table_speeches, table_contributions, output_format = "data.frame") {
@@ -156,7 +157,7 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
     )
 
   tokens_count <- table_speeches %>%
-    dplyr::mutate(n_tokens = str_count(speech_content, "\\w+")) %>%
+    dplyr::mutate(n_tokens = stringr::str_count(speech_content, "\\w+")) %>%
     dplyr::group_by(electoral_term) %>%
     dplyr::summarise(n = sum(n_tokens)) %>%
     dplyr::ungroup() %>%
@@ -181,7 +182,7 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
     )
 
   tokens_contributions_count <- contrib_et %>%
-    dplyr::mutate(n_tokens = str_count(content, "\\w+")) %>%
+    dplyr::mutate(n_tokens = stringr::str_count(content, "\\w+")) %>%
     dplyr::group_by(electoral_term) %>%
     dplyr::summarise(n = sum(n_tokens)) %>%
     dplyr::ungroup() %>%
@@ -201,7 +202,7 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
       contributions_count,
       tokens_contributions_count
     ),
-    left_join
+    dplyr::left_join
   ) %>%
     suppressMessages() %>%
     dplyr::rename(`Electoral Term` = electoral_term)
@@ -210,13 +211,25 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
     df
   } else if (output_format == "latex") {
     df %>%
-      mutate(
-        across(
+      dplyr::mutate(
+        dplyr::across(
         4:dplyr::last_col(),
         ~ scales::number(.x, big.mark = ".", decimal.mark = " ")
         )
       ) %>%
-      knitr::kable(booktabs = T, format = "latex", col.names = linebreak) %>%
+      knitr::kable(
+        format = "latex",
+        booktabs = T,
+        escape = F,
+        col.names = kableExtra::linebreak(
+          colnames(table1) %>% stringr::str_replace(" ", "\n"),
+          align = "l"
+          ),
+        align = paste0(
+          "r",
+          paste0(rep("l", length(colnames(df))), collapse = "")
+        )
+      ) %>%
       kableExtra::kable_styling(full_width = F, position = "left", latex_options = "scale_down") %>%
       kableExtra::row_spec(0, align = "c", bold = T) %>%
       kableExtra::column_spec(1, bold = T)
