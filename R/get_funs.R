@@ -210,7 +210,7 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
   if (output_format == "data.frame") {
     df
   } else if (output_format == "latex") {
-    df %>%
+    latex_table <- df %>%
       dplyr::mutate(
         dplyr::across(
         4:dplyr::last_col(),
@@ -233,6 +233,9 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
       kableExtra::kable_styling(full_width = F, position = "left", latex_options = "scale_down") %>%
       kableExtra::row_spec(0, align = "c", bold = T) %>%
       kableExtra::column_spec(1, bold = T)
+
+    message("When using this table in LaTeX, you have to include the package 'makecell'.")
+    return(latex_table)
   }
 }
 
