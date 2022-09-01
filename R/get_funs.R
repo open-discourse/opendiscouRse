@@ -222,7 +222,7 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
         booktabs = T,
         escape = F,
         col.names = kableExtra::linebreak(
-          colnames(table1) %>% stringr::str_replace(" ", "\n"),
+          colnames(df) %>% stringr::str_replace(" ", "\n"),
           align = "l"
           ),
         align = paste0(
