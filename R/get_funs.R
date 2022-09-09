@@ -30,30 +30,72 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
   round(as.numeric(date_hist - date_birth) / 365, round_val)
 }
 
-#' Get legislative periods where politicians make speeches.
+#' Generate list of electoral term affilions per politician.
 #'
-#' @param data Input data frame.
-#' @param input_id Input politician id.
-#' @param output_format Format of output, either "data.frame" or "vector". Default is "data.frame".
+#' @param data Input `data.frame`.
+#' @param id_value Politician ID values.
 #'
-#' @return A data frame or (integer) vector.
+#' @return A `list`.
+#'
+.ets_pol_id <- function(data, id_value) {
+  data %>%
+    dplyr::filter(politician_id == id_value) %>%
+    dplyr::distinct(electoral_term) %>%
+    dplyr::arrange(electoral_term) %>%
+    dplyr::pull() %>%
+    list()
+}
+
+#' Get electoral term affiliations of politicians.
+#'
+#' @param data Input `data.frame`.
+#' @param var Name of variable (`character`) that contains the electoral term values.
+#' @param dummy A `logical` value indicating whether to generate dummy variables per electoral term (`TRUE`) or a single `list` variable. Default is `TRUE`.
+#' @param merge A `logical` value indicating whether to return just the generated columns (`FALSE`) or the whole `data.frame` (`TRUE`). Default is `TRUE`.
+#'
+#' @return A `data.frame`.
 #' @importFrom magrittr %>%
 #' @export
 #'
-get_lps <- function(data, input_id, output_format = "data.frame") {
-  if (output_format == "data.frame") {
-    # speeches
-    data %>%
-      dplyr::mutate(politician_id = politician_id %>% as.character()) %>%
-      dplyr::filter(politician_id %in% input_id) %>%
-      dplyr::distinct(politician_id, electoral_term)
-  } else if (output_format == "vector") {
-    # speeches
-    data %>%
-      dplyr::mutate(politician_id = politician_id %>% as.character()) %>%
-      dplyr::filter(politician_id %in% input_id) %>%
-      dplyr::distinct(electoral_term) %>%
-      dplyr::pull()
+get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
+  checkmate::check_data_frame(data)
+
+  var <- rlang::sym(var)
+
+  if (dummy == TRUE) {
+    ets_df <- data %>%
+      dplyr::arrange(as.numeric(!!var)) %>%
+      tidyr::pivot_wider(
+        names_from = !!var,
+        names_prefix = "et_",
+        values_from = !!var
+      ) %>%
+      dplyr::mutate(
+        dplyr::across(dplyr::starts_with("et_"), ~ ifelse(!is.na(.x), 1, 0))
+      ) %>%
+      dplyr::group_by(politician_id) %>%
+      dplyr::summarise(dplyr::across(dplyr::starts_with("et_"), ~ max(.x))) %>%
+      dplyr::select(dplyr::starts_with("et_"))
+    if (merge == TRUE) {
+      data %>%
+        dplyr::left_join(lps_df)
+    } else {
+      ets_df
+    }
+  } else {
+    data$electoral_terms <- purrr::map(
+      data %>% dplyr::pull(politician_id),
+      ~ .ets_pol_id(data = df, id_value = .x)
+    ) %>%
+      purrr::map(
+        ~ purrr::pluck(.x, 1)
+      )
+    if (merge == TRUE) {
+      data
+    } else {
+      data %>%
+        dplyr::select(electoral_terms)
+    }
   }
 }
 
@@ -212,6 +254,138 @@ get_state <- function(politician_id, electoral_term) {
     paste0(politician_id, "_", electoral_term),
     df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
   )]
+  
+#' Get main table ("Table 1") with descriptive summaries of the database.
+#'
+#' @param table_speeches A `data.frame` object, indicating the `speeches` table.
+#' @param table_contributions  A `data.frame` object, indicating the `contributions_simplified` table.
+#' @param output_format A `character`, either `"data.frame"` or `"latex"`, indicating the output format. Default is `"data.frame"`.
+#'
+#' @return Either a `data.frame` (default), or `LaTeX` table code.
+#' @importFrom magrittr %>%
+#' @export
+#'
+get_table_1 <- function(table_speeches, table_contributions, output_format = "data.frame") {
+  checkmate::assert_data_frame(table_speeches)
+  checkmate::assert_data_frame(table_contributions)
+
+  min_date <- table_speeches %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::filter(date == min(date)) %>%
+    dplyr::distinct(electoral_term, date) %>%
+    dplyr::rename(`Earliest Date` = date) %>%
+    dplyr::ungroup()
+
+  max_date <- table_speeches %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::filter(date == max(date)) %>%
+    dplyr::distinct(electoral_term, date) %>%
+    dplyr::rename(`Latest Date` = date) %>%
+    dplyr::ungroup()
+
+  sessions_count <- table_speeches %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::distinct(session) %>%
+    dplyr::count() %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Sessions Count` = n,
+      `Cumulated Sessions Count` = cum_sum_n
+    )
+
+  speeches_count <- table_speeches %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::count() %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Speeches Count` = n,
+      `Cumulated Speeches Count` = cum_sum_n
+    )
+
+  tokens_count <- table_speeches %>%
+    dplyr::mutate(n_tokens = stringr::str_count(speech_content, "\\w+")) %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::summarise(n = sum(n_tokens)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Tokens Count` = n,
+      `Cumulated Tokens Count` = cum_sum_n
+    )
+
+  contrib_et <- table_speeches %>%
+    dplyr::select(id, electoral_term, date) %>%
+    dplyr::right_join(table_contributions, by = c("id" = "speech_id"))
+
+  contributions_count <- contrib_et %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::count() %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Contributions Count` = n,
+      `Cumulated Contributions Count` = cum_sum_n
+    )
+
+  tokens_contributions_count <- contrib_et %>%
+    dplyr::mutate(n_tokens = stringr::str_count(content, "\\w+")) %>%
+    dplyr::group_by(electoral_term) %>%
+    dplyr::summarise(n = sum(n_tokens)) %>%
+    dplyr::ungroup() %>%
+    dplyr::mutate(cum_sum_n = cumsum(n)) %>%
+    dplyr::rename(
+      `Tokens Count` = n,
+      `Cumulated Tokens Count` = cum_sum_n
+    )
+
+  df <- purrr::reduce(
+    list(
+      min_date,
+      max_date,
+      sessions_count,
+      speeches_count,
+      tokens_count,
+      contributions_count,
+      tokens_contributions_count
+    ),
+    dplyr::left_join
+  ) %>%
+    suppressMessages() %>%
+    dplyr::rename(`Electoral Term` = electoral_term)
+
+  if (output_format == "data.frame") {
+    df
+  } else if (output_format == "latex") {
+    latex_table <- df %>%
+      dplyr::mutate(
+        dplyr::across(
+        4:dplyr::last_col(),
+        ~ scales::number(.x, big.mark = ".", decimal.mark = " ")
+        )
+      ) %>%
+      knitr::kable(
+        format = "latex",
+        booktabs = T,
+        escape = F,
+        col.names = kableExtra::linebreak(
+          colnames(df) %>% stringr::str_replace(" ", "\n"),
+          align = "l"
+          ),
+        align = paste0(
+          "r",
+          paste0(rep("l", length(colnames(df))), collapse = "")
+        )
+      ) %>%
+      kableExtra::kable_styling(full_width = F, position = "left", latex_options = "scale_down") %>%
+      kableExtra::row_spec(0, align = "c", bold = T) %>%
+      kableExtra::column_spec(1, bold = T)
+
+    message("When using this table in LaTeX, you have to include the package 'makecell'.")
+    return(latex_table)
+  }
+}
 
   check_volkskammer[is.na(check_volkskammer)] <- 0
 
