@@ -30,31 +30,72 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
   round(as.numeric(date_hist - date_birth) / 365, round_val)
 }
 
-#' Get legislative periods where politicians make speeches.
+#' Generate list of electoral term affilions per politician.
 #'
+#' @param data Input `data.frame`.
+#' @param id_value Politician ID values.
 #'
-#' @param data Input data frame.
-#' @param input_id Input politician id.
-#' @param output_format Format of output, either "data.frame" or "vector". Default is "data.frame".
+#' @return A `list`.
 #'
-#' @return A data frame or (integer) vector.
+.ets_pol_id <- function(data, id_value) {
+  data %>%
+    dplyr::filter(politician_id == id_value) %>%
+    dplyr::distinct(electoral_term) %>%
+    dplyr::arrange(electoral_term) %>%
+    dplyr::pull() %>%
+    list()
+}
+
+#' Get electoral term affiliations of politicians.
+#'
+#' @param data Input `data.frame`.
+#' @param var Name of variable (`character`) that contains the electoral term values.
+#' @param dummy A `logical` value indicating whether to generate dummy variables per electoral term (`TRUE`) or a single `list` variable. Default is `TRUE`.
+#' @param merge A `logical` value indicating whether to return just the generated columns (`FALSE`) or the whole `data.frame` (`TRUE`). Default is `TRUE`.
+#'
+#' @return A `data.frame`.
 #' @importFrom magrittr %>%
 #' @export
 #'
-get_lps <- function(data, input_id, output_format = "data.frame") {
-  if (output_format == "data.frame") {
-    # speeches
-    data %>%
-      dplyr::mutate(politician_id = politician_id %>% as.character()) %>%
-      dplyr::filter(politician_id %in% input_id) %>%
-      dplyr::distinct(politician_id, electoral_term)
-  } else if (output_format == "vector") {
-    # speeches
-    data %>%
-      dplyr::mutate(politician_id = politician_id %>% as.character()) %>%
-      dplyr::filter(politician_id %in% input_id) %>%
-      dplyr::distinct(electoral_term) %>%
-      dplyr::pull()
+get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
+  checkmate::check_data_frame(data)
+
+  var <- rlang::sym(var)
+
+  if (dummy == TRUE) {
+    ets_df <- data %>%
+      dplyr::arrange(as.numeric(!!var)) %>%
+      tidyr::pivot_wider(
+        names_from = !!var,
+        names_prefix = "et_",
+        values_from = !!var
+      ) %>%
+      dplyr::mutate(
+        dplyr::across(dplyr::starts_with("et_"), ~ ifelse(!is.na(.x), 1, 0))
+      ) %>%
+      dplyr::group_by(politician_id) %>%
+      dplyr::summarise(dplyr::across(dplyr::starts_with("et_"), ~ max(.x))) %>%
+      dplyr::select(dplyr::starts_with("et_"))
+    if (merge == TRUE) {
+      data %>%
+        dplyr::left_join(lps_df)
+    } else {
+      ets_df
+    }
+  } else {
+    data$electoral_terms <- purrr::map(
+      data %>% dplyr::pull(politician_id),
+      ~ .ets_pol_id(data = df, id_value = .x)
+    ) %>%
+      purrr::map(
+        ~ purrr::pluck(.x, 1)
+      )
+    if (merge == TRUE) {
+      data
+    } else {
+      data %>%
+        dplyr::select(electoral_terms)
+    }
   }
 }
 
