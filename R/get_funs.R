@@ -148,6 +148,113 @@ get_profession_groups <- function(data, var, merge = TRUE) {
   }
 }
 
+#' Get state affiliation of elected politician (either list or direct mandate).
+#'
+#' @param politician_id A `character` vector containing the politician ID values.
+#' @param electoral_term A `character` vector containing the electoral term values (number of the legislative period).
+#'
+#' @return An object of type `character`.
+#' @importFrom magrittr %>%
+#' @export
+#'
+get_state <- function(politician_id, electoral_term) {
+  checkmate::assert_character(politician_id)
+  checkmate::assert_character(electoral_term)
+
+  url <- "https://www.bundestag.de/resource/blob/472878/4b9303987cc0520ed0d56b7a0311930a/MdB-Stammdaten-data.zip"
+  temp <- tempfile()
+  download.file(url, temp, quiet = TRUE)
+  stammdaten <- xml2::read_xml(unz(temp, "MDB_STAMMDATEN.XML"))
+  unlink(temp)
+
+  blnd_mapping <- c("BAD" = "Baden-Württemberg",
+                    "BAY" = "Bayern",
+                    "BB" = "Brandenburg",
+                    "BE" = "Berlin",
+                    "BLN" = "Berlin",
+                    "BRA" = "Brandenburg",
+                    "BRE" = "Bremen",
+                    "BW" = "Baden-Württemberg",
+                    "BWG" = "Baden-Württemberg",
+                    "BY" = "Bayern",
+                    "HB" = "Bremen", # changed
+                    "HBG" = "Hamburg",
+                    "HE" = "Hessen",
+                    "HES" = "Hessen",
+                    "HH" = "Hamburg",
+                    "MBV" = "Mecklenburg-Vorpommern",
+                    "MV" = "Mecklenburg-Vorpommern",
+                    "NDS" = "Niedersachsen",
+                    "NI" = "Niedersachsen",
+                    "NRW" = "Nordrhein-Westfalen",
+                    "NW" = "Nordrhein-Westfalen",
+                    "RP" = "Rheinland-Pfalz",
+                    "RPF" = "Rheinland-Pfalz",
+                    "SAA" = "Sachsen-Anhalt",
+                    "SAC" = "Sachsen",
+                    "SH" = "Schleswig-Holstein",
+                    "SL" = "Saarland",
+                    "SLD" = "Saarland",
+                    "SN" = "Sachsen",
+                    "ST" = "Sachsen-Anhalt",
+                    "SWH" = "Schleswig-Holstein",
+                    "TH" = "Thüringen",
+                    "THÜ" =  "Thüringen",
+                    "WBB" = "Baden-Württemberg",
+                    "WBH" = "Baden-Württemberg") %>%
+    tibble::tibble(abbr = names(.), name = .)
+
+  id_col <- rep(
+    stammdaten %>%
+      xml2::xml_find_all("//MDB/ID") %>%
+      xml2::xml_text(),
+    stammdaten %>%
+      xml2::xml_find_all("//MDB/WAHLPERIODEN") %>%
+      xml2::xml_length()
+  ) %>%
+    tibble::as_tibble_col("id")
+
+  wkr_land_col <- stammdaten %>%
+    xml2::xml_find_all(".//WKR_LAND") %>%
+    xml2::xml_text() %>%
+    tibble::as_tibble_col("WKR_LAND")
+
+  liste_col <- stammdaten %>%
+    xml2::xml_find_all(".//LISTE") %>%
+    xml2::xml_text() %>%
+    tibble::as_tibble_col("LISTE")
+
+  wp_col <- stammdaten %>%
+    xml2::xml_find_all(".//WP") %>%
+    xml2::xml_text() %>%
+    tibble::as_tibble_col("WP")
+
+  df <- tibble(id_col, wp_col, wkr_land_col, liste_col) %>%
+    dplyr::mutate(
+      volkskammer_dummy = ifelse(stringr::str_detect(LISTE, "\\*\\*\\*"), 1, 0),
+      dplyr::across(
+        c(WKR_LAND, LISTE),
+        ~ dplyr::case_when(
+          . == "" ~ NA_character_,
+          stringr::str_detect(., "\\*\\*\\*") ~ NA_character_,
+          stringr::str_detect(., "\\*\\*") ~ "BLN",
+          stringr::str_detect(., "\\*") ~ "SLD",
+          TRUE ~ .
+        )
+      ),
+      state = dplyr::case_when(
+        !is.na(WKR_LAND) ~ WKR_LAND,
+        !is.na(LISTE) ~ LISTE,
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    dplyr::left_join(blnd_mapping, by = c("state" = "abbr"))
+
+  check_volkskammer <- df$volkskammer_dummy[match(
+    paste0(politician_id, "_", electoral_term),
+    df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
+  )]
+  
 #' Get main table ("Table 1") with descriptive summaries of the database.
 #'
 #' @param table_speeches A `data.frame` object, indicating the `speeches` table.
@@ -280,5 +387,18 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
   }
 }
 
+  check_volkskammer[is.na(check_volkskammer)] <- 0
 
+  if (!is.null(check_volkskammer)) {
+    if (any(check_volkskammer == 1)) {
+      warning('NA values are generated for observations that are labelled with "von der Volkskammer gewählt".')
+    }
+  }
+
+  df$name[match(
+    paste0(politician_id, "_", electoral_term),
+    df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
+  )]
+
+}
 
