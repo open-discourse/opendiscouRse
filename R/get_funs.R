@@ -148,6 +148,29 @@ get_profession_groups <- function(data, var, merge = TRUE) {
   }
 }
 
+#' Get color code of factions.
+#'
+#' @param input_id A `character` indicating the ID of the faction.
+#' @param id_type A `character` indicating the type of the `input_id`, either `"number"` (ID of the faction) or `"faction_name"` (abbreviated name of the faction). Default is `"number"`.
+#'
+#' @return A (named) `character` yielding a hexadecimal color code.
+#' @importFrom magrittr %>%
+#' @export
+#'
+get_faction_color <- function(input_id, id_type = "number") {
+  faction_colors <- readr::read_csv("data/faction_colors.csv") %>%
+    suppressMessages()
+
+  colors <- faction_colors %>% dplyr::pull(hex_color_code)
+  if (id_type == "number") {
+    names(colors) <- faction_colors %>% dplyr::pull(faction_id)
+  } else if (id_type == "faction_name") {
+    names(colors) <- faction_colors %>% dplyr::pull(abbreviation)
+  }
+
+  colors[as.character(input_id)]
+}
+
 #' Get state affiliation of elected politician (either list or direct mandate).
 #'
 #' @param politician_id A `character` vector containing the politician ID values.
@@ -255,6 +278,20 @@ get_state <- function(politician_id, electoral_term) {
     df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
   )]
   
+  check_volkskammer[is.na(check_volkskammer)] <- 0
+
+  if (!is.null(check_volkskammer)) {
+    if (any(check_volkskammer == 1)) {
+      warning('NA values are generated for observations that are labelled with "von der Volkskammer gewählt".')
+    }
+  }
+
+  df$name[match(
+    paste0(politician_id, "_", electoral_term),
+    df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
+  )]
+}
+
 #' Get main table ("Table 1") with descriptive summaries of the database.
 #'
 #' @param table_speeches A `data.frame` object, indicating the `speeches` table.
@@ -387,22 +424,9 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
   }
 }
 
-  check_volkskammer[is.na(check_volkskammer)] <- 0
-
-  if (!is.null(check_volkskammer)) {
-    if (any(check_volkskammer == 1)) {
-      warning('NA values are generated for observations that are labelled with "von der Volkskammer gewählt".')
-    }
-  }
-
-  df$name[match(
-    paste0(politician_id, "_", electoral_term),
-    df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
-  )]
-
 #' Get data that is implausible based on specific data table based information.
 #'
-#' @param data Input data frame.
+#' @param data Input `data.frame`.
 #'
 #' @return A `data.frame`.
 #' @importFrom magrittr %>%
