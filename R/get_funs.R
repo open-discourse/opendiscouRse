@@ -3,7 +3,7 @@
 #' @param date_birth Birth date of politician.
 #' @param round_val Numeric value indicating how much the age should be rounded, default is 2.
 #'
-#' @return Current age of a politician (numeric).
+#' @return Current age of a politician (`numeric`).
 #' @import checkmate
 #' @export
 #'
@@ -18,7 +18,7 @@ get_age <- function(date_birth, round_val = 2) {
 #' @param date_birth Birth date of politician.
 #' @param round_val Numeric value indicating how much the age should be rounded, default is 2.
 #'
-#' @return Historic age of a politician based on a certain date, such as the starting date of a legislative period (numeric).
+#' @return Historic age of a politician based on a certain date, such as the starting date of a legislative period (`numeric`).
 #' @import checkmate
 #' @export
 #'
@@ -160,6 +160,15 @@ get_profession_groups <- function(data, var, merge = TRUE) {
 get_faction_color <- function(input_id, id_type = "number") {
   faction_colors <- readr::read_csv("data/faction_colors.csv") %>%
     suppressMessages()
+  # faction_colors <- read.csv(
+  #   system.file("data", "faction_colors.csv", package = "opendiscouRse")
+  # )
+  # faction_colors <- readr::read_csv(
+  #   file.path(
+  #     system.file("data", package = "opendiscouRse"),
+  #     "faction_colors.csv"
+  #   )
+  # )
 
   colors <- faction_colors %>% dplyr::pull(hex_color_code)
   if (id_type == "number") {
@@ -277,7 +286,7 @@ get_state <- function(politician_id, electoral_term) {
     paste0(politician_id, "_", electoral_term),
     df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
   )]
-  
+
   check_volkskammer[is.na(check_volkskammer)] <- 0
 
   if (!is.null(check_volkskammer)) {
