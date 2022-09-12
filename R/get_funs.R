@@ -124,7 +124,7 @@ get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
 #' @export
 #'
 get_profession_groups <- function(data, var, merge = TRUE) {
-  check_data_frame(data)
+  checkmate::assert_data_frame(data)
 
   jobs <- rjson::fromJSON(file = "data/jobs.json")
 
@@ -400,5 +400,25 @@ get_table_1 <- function(table_speeches, table_contributions, output_format = "da
     df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
   )]
 
+#' Get data that is implausible based on specific data table based information.
+#'
+#' @param data Input data frame.
+#'
+#' @return A `data.frame`.
+#' @importFrom magrittr %>%
+#' @export
+#'
+get_implausible_data <- function(data) {
+  checkmate::assert_data_frame(data)
+
+  if (deparse(substitute(data)) == "speeches") {
+    data %>%
+      dplyr::filter(position_short == "Member of Parliament") %>%
+      dplyr::filter(faction_id == -1)
+  } else if (deparse(substitute(data)) == "contributions_extended") {
+    data %>%
+      dplyr::filter(politician_id != -1) %>%
+      dplyr::filter(faction_id == -1)
+  }
 }
 
