@@ -1,7 +1,7 @@
 #' Get age of politician.
 #'
-#' @param date_birth Birth date of politician.
-#' @param round_val Numeric value indicating how much the age should be rounded, default is 2.
+#' @param date_birth Birth `Date` of politician.
+#' @param round_val `Numeric` value indicating how much the age should be rounded, default is 2.
 #'
 #' @return Current age of a politician (`numeric`).
 #' @import checkmate
@@ -14,9 +14,9 @@ get_age <- function(date_birth, round_val = 2) {
 
 #' Get age of politician based on a historic date.
 #'
-#' @param date_hist Historic date on which age computation is based on.
-#' @param date_birth Birth date of politician.
-#' @param round_val Numeric value indicating how much the age should be rounded, default is 2.
+#' @param date_hist Historic `Date` on which age computation is based on.
+#' @param date_birth Birth `Date` of politician.
+#' @param round_val `Numeric` value indicating how much the age should be rounded, default is 2.
 #'
 #' @return Historic age of a politician based on a certain date, such as the starting date of a legislative period (`numeric`).
 #' @import checkmate
@@ -101,8 +101,8 @@ get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
 
 #' Generate dummy variables for profession variable.
 #'
-#' @param var Name of variable that contains the profession values.
-#' @param group_name Name of the profession group.
+#' @param var `character` name of variable that contains the profession values.
+#' @param group_name `character` name of the profession group.
 #'
 #' @return
 #'
@@ -115,9 +115,9 @@ get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
 
 #' Get professional group affiliation of politicians' jobs.
 #'
-#' @param data Input data frame.
-#' @param var Name of variable that contains the profession values.
-#' @param merge A boolean value indicating whether to return just the profession groups or the whole data frame. Default is `TRUE`.
+#' @param data Input `data.frame`.
+#' @param var Name of variable (`character`) that contains the profession values.
+#' @param merge A `logical` value indicating whether to return just the profession groups or the whole data frame. Default is `TRUE`.
 #'
 #' @return A data frame.
 #' @importFrom magrittr %>%
