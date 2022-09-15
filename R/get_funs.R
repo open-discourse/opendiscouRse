@@ -30,7 +30,7 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
   round(as.numeric(date_hist - date_birth) / 365, round_val)
 }
 
-#' Generate list of electoral term affilions per politician.
+#' Generate list of electoral term affiliations per politician.
 #'
 #' @param data Input `data.frame`.
 #' @param id_value Politician ID values.
@@ -40,6 +40,7 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
 .ets_pol_id <- function(data, id_value) {
   data %>%
     dplyr::filter(politician_id == id_value) %>%
+    dplyr::mutate(electoral_term = as.numeric(electoral_term)) %>%
     dplyr::distinct(electoral_term) %>%
     dplyr::arrange(electoral_term) %>%
     dplyr::pull() %>%
@@ -74,22 +75,26 @@ get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
         dplyr::across(dplyr::starts_with("et_"), ~ ifelse(!is.na(.x), 1, 0))
       ) %>%
       dplyr::group_by(politician_id) %>%
-      dplyr::summarise(dplyr::across(dplyr::starts_with("et_"), ~ max(.x))) %>%
-      dplyr::select(dplyr::starts_with("et_"))
+      dplyr::mutate(dplyr::across(dplyr::starts_with("et_"), ~ max(.x))) %>%
+      dplyr::select(politician_id, dplyr::starts_with("et_")) %>%
+      dplyr::ungroup() %>%
+      dplyr::distinct(politician_id, .keep_all = TRUE)
     if (merge == TRUE) {
       data %>%
-        dplyr::left_join(lps_df)
+        dplyr::left_join(ets_df, by = "politician_id") %>%
+        suppressMessages()
     } else {
       ets_df
     }
   } else {
     data$electoral_terms <- purrr::map(
       data %>% dplyr::pull(politician_id),
-      ~ .ets_pol_id(data = df, id_value = .x)
+      ~ .ets_pol_id(data = data, id_value = .x)
     ) %>%
       purrr::map(
         ~ purrr::pluck(.x, 1)
-      )
+      ) %>%
+      tibble::as_tibble_col()
     if (merge == TRUE) {
       data
     } else {
