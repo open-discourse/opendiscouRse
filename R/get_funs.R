@@ -195,8 +195,14 @@ get_faction_color <- function(input_id, id_type = "number") {
 #' @export
 #'
 get_state <- function(politician_id, electoral_term) {
-  checkmate::assert_character(politician_id)
-  checkmate::assert_character(electoral_term)
+  checkmate::assert_multi_class(
+    politician_id,
+    c("character", "numeric")
+  )
+  checkmate::assert_multi_class(
+    electoral_term,
+    c("character", "numeric")
+  )
 
   url <- "https://www.bundestag.de/resource/blob/472878/4b9303987cc0520ed0d56b7a0311930a/MdB-Stammdaten-data.zip"
   temp <- tempfile()
@@ -266,7 +272,7 @@ get_state <- function(politician_id, electoral_term) {
     xml2::xml_text() %>%
     tibble::as_tibble_col("WP")
 
-  df <- tibble(id_col, wp_col, wkr_land_col, liste_col) %>%
+  df <- tibble::tibble(id_col, wp_col, wkr_land_col, liste_col) %>%
     dplyr::mutate(
       volkskammer_dummy = ifelse(stringr::str_detect(LISTE, "\\*\\*\\*"), 1, 0),
       dplyr::across(
