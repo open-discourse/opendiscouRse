@@ -137,7 +137,7 @@ get_profession_groups <- function(data, var, merge = TRUE) {
     names() %>%
     .[!(. == "sonstiges")]
 
-  df <- map(
+  df <- purrr::map(
     jobs_names,
     ~ .group_dummy_fun(data %>% dplyr::pull(var) %>% stringr::str_to_lower(), .x)
   ) %>%
