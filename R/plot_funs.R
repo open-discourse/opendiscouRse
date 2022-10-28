@@ -193,12 +193,12 @@ plot_rel_freq <- function(data, x_var, fill_var, facet_var = NULL, exclude_na = 
   )
 
   sum_test <- data %>%
-    dplyr::group_by(dplyr::across( {{ x_var }} )) %>%
+    dplyr::group_by(dplyr::across( {{ fill_var }} )) %>%
     dplyr::summarise(sum = sum(rel_freq)) %>%
     dplyr::distinct(sum) %>%
     dplyr::pull()
 
-  checkmate::assert_true(all(sum_test == 1))
+  checkmate::assert_true(all(dplyr::near(sum_test, 1)))
 
   x_var <- rlang::sym(x_var)
   fill_var <- rlang::sym(fill_var)
