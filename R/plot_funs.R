@@ -172,7 +172,7 @@ plot_count <- function(data, x_var, fill_var = NULL, facet_var = NULL, exclude_n
 #' @param data Input `data.frame` (function is designed to work with data generated from `rel_freq_data()`).
 #' @param x_var Single `character` value indicating which variable is displayed on the x axis.
 #' @param fill_var Single `character` value indicating which variable is used to fill the plot (`fill` argument in `ggplot()`).
-#' @param facet_var #' @param facet_var Single `character` value indicating which variable is used to facet the plot (via `facet_wrap()`) . Default is `NULL`.
+#' @param facet_var Single `character` value indicating which variable is used to facet the plot (via `facet_wrap()`) . Default is `NULL`.
 #' @param exclude_na `logical` value indicating whether to exclude `NA`s in the plot (checks all variables indicated via other parameters). Default is `FALSE`.
 #'
 #' @return A `ggplot` object.
