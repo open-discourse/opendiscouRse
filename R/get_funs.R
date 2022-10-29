@@ -1,9 +1,9 @@
 #' Get age of politician.
 #'
-#' @param date_birth Birth date of politician.
-#' @param round_val Numeric value indicating how much the age should be rounded, default is 2.
+#' @param date_birth Birth `Date` of politician.
+#' @param round_val `Numeric` value indicating how much the age should be rounded, default is 2.
 #'
-#' @return Current age of a politician (numeric).
+#' @return Current age of a politician (`numeric`).
 #' @import checkmate
 #' @export
 #'
@@ -14,11 +14,11 @@ get_age <- function(date_birth, round_val = 2) {
 
 #' Get age of politician based on a historic date.
 #'
-#' @param date_hist Historic date on which age computation is based on.
-#' @param date_birth Birth date of politician.
-#' @param round_val Numeric value indicating how much the age should be rounded, default is 2.
+#' @param date_hist Historic `Date` on which age computation is based on.
+#' @param date_birth Birth `Date` of politician.
+#' @param round_val `Numeric` value indicating how much the age should be rounded, default is 2.
 #'
-#' @return Historic age of a politician based on a certain date, such as the starting date of a legislative period (numeric).
+#' @return Historic age of a politician based on a certain date, such as the starting date of a legislative period (`numeric`).
 #' @import checkmate
 #' @export
 #'
@@ -30,7 +30,7 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
   round(as.numeric(date_hist - date_birth) / 365, round_val)
 }
 
-#' Generate list of electoral term affilions per politician.
+#' Generate list of electoral term affiliations per politician.
 #'
 #' @param data Input `data.frame`.
 #' @param id_value Politician ID values.
@@ -40,6 +40,7 @@ get_age_hist <- function(date_hist, date_birth, round_val = 2) {
 .ets_pol_id <- function(data, id_value) {
   data %>%
     dplyr::filter(politician_id == id_value) %>%
+    dplyr::mutate(electoral_term = as.numeric(electoral_term)) %>%
     dplyr::distinct(electoral_term) %>%
     dplyr::arrange(electoral_term) %>%
     dplyr::pull() %>%
@@ -74,22 +75,26 @@ get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
         dplyr::across(dplyr::starts_with("et_"), ~ ifelse(!is.na(.x), 1, 0))
       ) %>%
       dplyr::group_by(politician_id) %>%
-      dplyr::summarise(dplyr::across(dplyr::starts_with("et_"), ~ max(.x))) %>%
-      dplyr::select(dplyr::starts_with("et_"))
+      dplyr::mutate(dplyr::across(dplyr::starts_with("et_"), ~ max(.x))) %>%
+      dplyr::select(politician_id, dplyr::starts_with("et_")) %>%
+      dplyr::ungroup() %>%
+      dplyr::distinct(politician_id, .keep_all = TRUE)
     if (merge == TRUE) {
       data %>%
-        dplyr::left_join(lps_df)
+        dplyr::left_join(ets_df, by = "politician_id") %>%
+        suppressMessages()
     } else {
       ets_df
     }
   } else {
     data$electoral_terms <- purrr::map(
       data %>% dplyr::pull(politician_id),
-      ~ .ets_pol_id(data = df, id_value = .x)
+      ~ .ets_pol_id(data = data, id_value = .x)
     ) %>%
       purrr::map(
         ~ purrr::pluck(.x, 1)
-      )
+      ) %>%
+      tibble::as_tibble_col()
     if (merge == TRUE) {
       data
     } else {
@@ -101,8 +106,8 @@ get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
 
 #' Generate dummy variables for profession variable.
 #'
-#' @param var Name of variable that contains the profession values.
-#' @param group_name Name of the profession group.
+#' @param var `character` name of variable that contains the profession values.
+#' @param group_name `character` name of the profession group.
 #'
 #' @return
 #'
@@ -115,9 +120,9 @@ get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
 
 #' Get professional group affiliation of politicians' jobs.
 #'
-#' @param data Input data frame.
-#' @param var Name of variable that contains the profession values.
-#' @param merge A boolean value indicating whether to return just the profession groups or the whole data frame. Default is `TRUE`.
+#' @param data Input `data.frame`.
+#' @param var Name of variable (`character`) that contains the profession values.
+#' @param merge A `logical` value indicating whether to return just the profession groups or the whole data frame. Default is `TRUE`.
 #'
 #' @return A data frame.
 #' @importFrom magrittr %>%
@@ -132,7 +137,7 @@ get_profession_groups <- function(data, var, merge = TRUE) {
     names() %>%
     .[!(. == "sonstiges")]
 
-  df <- map(
+  df <- purrr::map(
     jobs_names,
     ~ .group_dummy_fun(data %>% dplyr::pull(var) %>% stringr::str_to_lower(), .x)
   ) %>%
@@ -160,6 +165,15 @@ get_profession_groups <- function(data, var, merge = TRUE) {
 get_faction_color <- function(input_id, id_type = "number") {
   faction_colors <- readr::read_csv("data/faction_colors.csv") %>%
     suppressMessages()
+  # faction_colors <- read.csv(
+  #   system.file("data", "faction_colors.csv", package = "opendiscouRse")
+  # )
+  # faction_colors <- readr::read_csv(
+  #   file.path(
+  #     system.file("data", package = "opendiscouRse"),
+  #     "faction_colors.csv"
+  #   )
+  # )
 
   colors <- faction_colors %>% dplyr::pull(hex_color_code)
   if (id_type == "number") {
@@ -181,8 +195,14 @@ get_faction_color <- function(input_id, id_type = "number") {
 #' @export
 #'
 get_state <- function(politician_id, electoral_term) {
-  checkmate::assert_character(politician_id)
-  checkmate::assert_character(electoral_term)
+  checkmate::assert_multi_class(
+    politician_id,
+    c("character", "numeric")
+  )
+  checkmate::assert_multi_class(
+    electoral_term,
+    c("character", "numeric")
+  )
 
   url <- "https://www.bundestag.de/resource/blob/472878/4b9303987cc0520ed0d56b7a0311930a/MdB-Stammdaten-data.zip"
   temp <- tempfile()
@@ -252,7 +272,7 @@ get_state <- function(politician_id, electoral_term) {
     xml2::xml_text() %>%
     tibble::as_tibble_col("WP")
 
-  df <- tibble(id_col, wp_col, wkr_land_col, liste_col) %>%
+  df <- tibble::tibble(id_col, wp_col, wkr_land_col, liste_col) %>%
     dplyr::mutate(
       volkskammer_dummy = ifelse(stringr::str_detect(LISTE, "\\*\\*\\*"), 1, 0),
       dplyr::across(
@@ -277,7 +297,7 @@ get_state <- function(politician_id, electoral_term) {
     paste0(politician_id, "_", electoral_term),
     df %>% dplyr::transmute(paste0(id, "_", WP)) %>% dplyr::pull()
   )]
-  
+
   check_volkskammer[is.na(check_volkskammer)] <- 0
 
   if (!is.null(check_volkskammer)) {
