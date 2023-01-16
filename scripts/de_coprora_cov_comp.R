@@ -4,25 +4,32 @@ library(magrittr)
 library(grid)
 library(ggtext)
 library(scales)
-source("src/plots/services/od_plot_theme.R")
-source("src/plots/services/finalise_plot.R")
+# source("src/plots/services/od_plot_theme.R")
+# source("src/plots/services/finalise_plot.R")
 
 
 #number of actual protocols existing per legislative period
 n_protocols_true <- c(282, 227, 168, 198, 247, 199, 259, 230, 142, 256, 236, 243, 248, 253, 187, 233, 253, 245, 171)
 
-#number of protocols covered by GermaParl
-germa_parl <- list.files("data/germaparl_xml/") %>% as_tibble()
+# GermaParl ---------------------------------------------------------------
+# number of protocols covered by GermaParl
+# germa_parl <- list.files("data/germaparl_xml/") %>% as_tibble()
+#
+# germa_parl %<>% mutate(period = substr(.$value, 4,5))
+#
+# germa_parl <- germa_parl %>%
+#   group_by(period) %>%
+#   summarise(germaparl_n_protocols = n()) %>%
+#   mutate(period = as.numeric(period))
 
-germa_parl %<>% mutate(period = substr(.$value, 4,5))
+# get data from this url https://github.com/PolMine/GermaParl/blob/master/data/germaparl_stats.RData?raw=true
+load("data_external/germaparl_stats.RData")
 
-germa_parl <- germa_parl %>%
-  group_by(period) %>%
-  summarise(germaparl_n_protocols = n()) %>%
-  mutate(period = as.numeric(period))
 
-#number of protocols covered by ParlSpeech
+# ParlSpeech --------------------------------------------------------------
+# number of protocols covered by ParlSpeech
 
+# get data from this url https://dataverse.harvard.edu/dataset.xhtml?persistentId=doi:10.7910/DVN/L4OAKN
 parlspeech <- readRDS("data/parlspeech/Corp_Bundestag_V2.rds")
 parlspeech$date <- date(as.POSIXct(parlspeech$date, origin = "1970-01-01"))
 
@@ -50,8 +57,14 @@ parlspeech %<>%
 
 
 # plot --------------------------------------------------------------------
-table_1 <- read_csv("data/table_1.csv")
-true_protocols_bg <- table_1[, c("wp", "real_protocol_n")] %>% ungroup() %>% mutate(period = as.numeric(wp))
+od_obj <- OpenDiscourse$new()
+speeches <- od_obj$get_data("speeches")$data
+contributions_simplified <- od_obj$get_data("contributions_simplified")$data
+
+table_1_od <- get_table_1(speeches, contributions_simplified, output_format = "data.frame")
+
+# table_1 <- read_csv("data/table_1.csv")
+true_protocols_bg <- table_1_od[, c("wp", "real_protocol_n")] %>% ungroup() %>% mutate(period = as.numeric(wp))
 
 table_1 %<>% select(Wahlperiode = wp,
                     `Open Discourse` = protocols,
