@@ -1,7 +1,7 @@
 library(magrittr)
 
 # remove after working solution is found
-VALID_GROUP_VARS <- c(
+VALID_GROUP_VARS <<- c(
   "session",
   "electoral_term",
   "politician_id",
@@ -44,8 +44,8 @@ test_that("count_data() with `sort_n_desc = TRUE` returns sorted grouped data.fr
     grouping_vars = "gender",
     sort_n_desc = TRUE
   ) %>%
-    slice(1) %>%
-    pull(n)
+    dplyr::slice(1) %>%
+    dplyr::pull(n)
 
   n_2 <- count_data(
     readr::read_csv(
@@ -57,8 +57,8 @@ test_that("count_data() with `sort_n_desc = TRUE` returns sorted grouped data.fr
     grouping_vars = "gender",
     sort_n_desc = TRUE
   ) %>%
-    slice(2) %>%
-    pull(n)
+    dplyr::slice(2) %>%
+    dplyr::pull(n)
 
   expect_true(n_1 > n_2)
 })
@@ -92,8 +92,8 @@ test_that("rel_freq_data() with `sort_n_desc = TRUE` returns sorted grouped data
     rel_freq_vars = "faction_id",
     sort_n_desc = TRUE
   ) %>%
-    slice(1) %>%
-    pull(n)
+    dplyr::slice(1) %>%
+    dplyr::pull(n)
 
   n_2 <- rel_freq_data(
     readr::read_csv(
@@ -106,8 +106,8 @@ test_that("rel_freq_data() with `sort_n_desc = TRUE` returns sorted grouped data
     rel_freq_vars = "faction_id",
     sort_n_desc = TRUE
   ) %>%
-    slice(2) %>%
-    pull(n)
+    dplyr::slice(2) %>%
+    dplyr::pull(n)
 
   expect_true(n_1 > n_2)
 })

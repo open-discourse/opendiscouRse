@@ -131,7 +131,7 @@ get_ets <- function(data, var, dummy = TRUE, merge = TRUE) {
 get_profession_groups <- function(data, var, merge = TRUE) {
   checkmate::assert_data_frame(data)
 
-  jobs <- rjson::fromJSON(file = "data/jobs.json")
+  jobs <- rjson::fromJSON(file = here::here("data/jobs.json"))
 
   jobs_names <- jobs %>%
     names() %>%
