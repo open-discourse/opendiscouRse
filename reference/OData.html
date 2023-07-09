@@ -67,6 +67,7 @@ or summary functions.</p>
 <ul><li><p><a href="#method-new"><code>OData$new()</code></a></p></li>
 <li><p><a href="#method-get_table_data"><code>OData$get_table_data()</code></a></p></li>
 <li><p><a href="#method-get_con"><code>OData$get_con()</code></a></p></li>
+<li><p><a href="#method-get_count"><code>OData$get_count()</code></a></p></li>
 <li><p><a href="#method-clone"><code>OData$clone()</code></a></p></li>
 </ul></div><p></p><hr><a id="method-new"></a><div class="section">
 <h3 id="method-new-">Method <code>new()</code><a class="anchor" aria-label="anchor" href="#method-new-"></a></h3>
@@ -142,18 +143,49 @@ Create db connection from OD docker defaults</p></dd>
 </div>
 <div class="section">
 <h4 id="returns">Returns<a class="anchor" aria-label="anchor" href="#returns"></a></h4>
-<p>RPostgres conn object</p>
+<p>RPostgres conn object
+Count observations by grouping variables.</p>
+</div>
+
+</div><p></p><hr><a id="method-get_count"></a><div class="section">
+<h3 id="method-get-count-">Method <code>get_count()</code><a class="anchor" aria-label="anchor" href="#method-get-count-"></a></h3>
+
+<div class="section">
+<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">OData</span><span class="op">$</span><span class="fu">get_count</span><span class="op">(</span><span class="va">grouping_vars</span>, sort_n_desc <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
+</div>
+
+<div class="section">
+<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<p></p><div class="arguments"><dl><dt><code>grouping_vars</code></dt>
+<dd><p>A character vector containing grouping variables of a data table.</p></dd>
+
+
+<dt><code>sort_n_desc</code></dt>
+<dd><p>A boolean value indicating whether the whole data frame should be
+sorted in descending order by n. Default is <code>FALSE</code>.</p></dd>
+
+
+<dt><code>table_name</code></dt>
+<dd><p>(<code>character</code>) character string of the table name</p></dd>
+
+
+</dl><p></p></div>
+</div>
+<div class="section">
+<h4 id="returns-1">Returns<a class="anchor" aria-label="anchor" href="#returns-1"></a></h4>
+<p>A (grouped) data frame.</p>
 </div>
 
 </div><p></p><hr><a id="method-clone"></a><div class="section">
 <h3 id="method-clone-">Method <code>clone()</code><a class="anchor" aria-label="anchor" href="#method-clone-"></a></h3>
 <p>The objects of this class are cloneable with this method.</p><div class="section">
-<h4 id="usage-3">Usage<a class="anchor" aria-label="anchor" href="#usage-3"></a></h4>
+<h4 id="usage-4">Usage<a class="anchor" aria-label="anchor" href="#usage-4"></a></h4>
 <p></p><div class="r"><div class="sourceCode"><pre><code><span><span class="va">OData</span><span class="op">$</span><span class="fu">clone</span><span class="op">(</span>deep <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div><p></p></div>
 </div>
 
 <div class="section">
-<h4 id="arguments-3">Arguments<a class="anchor" aria-label="anchor" href="#arguments-3"></a></h4>
+<h4 id="arguments-4">Arguments<a class="anchor" aria-label="anchor" href="#arguments-4"></a></h4>
 <p></p><div class="arguments"><dl><dt><code>deep</code></dt>
 <dd><p>Whether to make a deep clone.</p></dd>
 

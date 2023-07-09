@@ -22,9 +22,57 @@
     <loc>/reference/OpenDiscourse.html</loc>
   </url>
   <url>
+    <loc>/reference/count_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-ets_pol_id.html</loc>
+  </url>
+  <url>
+    <loc>/reference/dot-group_dummy_fun.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_age.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_age_hist.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_ets.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_faction_color.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_implausible_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_profession_groups.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_state.html</loc>
+  </url>
+  <url>
+    <loc>/reference/get_table_1.html</loc>
+  </url>
+  <url>
     <loc>/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/test_fun.html</loc>
+    <loc>/reference/plot_count.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_cov.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_dist.html</loc>
+  </url>
+  <url>
+    <loc>/reference/plot_rel_freq.html</loc>
+  </url>
+  <url>
+    <loc>/reference/rel_freq_data.html</loc>
+  </url>
+  <url>
+    <loc>/reference/theme_od.html</loc>
   </url>
 </urlset>
