@@ -1,4 +1,4 @@
-# opendiscouRse <img src="images/od_sticker.png" align="right" alt="" width="200" />
+# opendiscouRse <img src="man/figures/logo.png" align="right" alt="" width="200" />
 
 <img src="https://img.shields.io/badge/Development-Late%20Development%20Stage-green" />
 
