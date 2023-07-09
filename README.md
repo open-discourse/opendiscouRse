@@ -12,6 +12,10 @@ One of the main advantages of using an OOP framework lies in the exclusive alloc
 
 ---
 
+# Installation
+
+You can install the package with `devtools::install_github("open-discourse/opendiscouRse")`.
+
 # Functions
 
 ### `get` functions
