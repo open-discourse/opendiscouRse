@@ -22,6 +22,7 @@ or summary functions.
 \item \href{#method-new}{\code{OData$new()}}
 \item \href{#method-get_table_data}{\code{OData$get_table_data()}}
 \item \href{#method-get_con}{\code{OData$get_con()}}
+\item \href{#method-get_count}{\code{OData$get_count()}}
 \item \href{#method-clone}{\code{OData$clone()}}
 }
 }
@@ -92,6 +93,31 @@ Create db connection from OD docker defaults}
 }
 \subsection{Returns}{
 RPostgres conn object
+Count observations by grouping variables.
+}
+}
+\if{html}{\out{<hr>}}
+\if{html}{\out{<a id="method-get_count"></a>}}
+\if{latex}{\out{\hypertarget{method-get_count}{}}}
+\subsection{Method \code{get_count()}}{
+\subsection{Usage}{
+\if{html}{\out{<div class="r">}}\preformatted{OData$get_count(grouping_vars, sort_n_desc = FALSE)}\if{html}{\out{</div>}}
+}
+
+\subsection{Arguments}{
+\if{html}{\out{<div class="arguments">}}
+\describe{
+\item{\code{grouping_vars}}{A character vector containing grouping variables of a data table.}
+
+\item{\code{sort_n_desc}}{A boolean value indicating whether the whole data frame should be
+sorted in descending order by n. Default is \code{FALSE}.}
+
+\item{\code{table_name}}{(\code{character}) character string of the table name}
+}
+\if{html}{\out{</div>}}
+}
+\subsection{Returns}{
+A (grouped) data frame.
 }
 }
 \if{html}{\out{<hr>}}
