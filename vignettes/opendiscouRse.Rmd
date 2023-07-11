@@ -1,0 +1,107 @@
+---
+title: "Introduction to opendiscouRse"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to opendiscouRse}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  cache.lazy = FALSE
+)
+```
+
+```{r setup}
+library(opendiscouRse)
+```
+
+# Database setup
+
+For the integrated __Open Discourse__ database setup to work, you must set up database the database locally, e.g. by using Docker, as [described here](https://github.com/open-discourse/open-discourse#docker-setup).
+
+After configuring the database setup, we can obtain individual data tables from the `R6` class.
+
+```{r, cache=T}
+od_obj <- OData$new()
+politicians <- od_obj$get_table_data("politicians")$data
+factions <- od_obj$get_table_data("factions")$data
+contributions_simplified <- od_obj$get_table_data("contributions_simplified")$data
+# remove data-heavy variables for replication purposes
+speeches <- od_obj$get_table_data("speeches")$data |> dplyr::select(-c(speech_content, search_speech_content))
+```
+
+# Usage of functions
+
+## `get` functions
+
+### `get_age()`
+
+With the `get_age()` function, we can easily calculate the age of politicians.
+
+```{r}
+politicians |> 
+  dplyr::mutate(
+    age = ifelse(
+      is.na(death_date),
+      # Alive politicians
+      get_age(birth_date, round_val = 0),
+      # Dead politicians
+      get_age_hist(death_date, birth_date, round_val = 0)
+    )
+  ) |> 
+  dplyr::select(first_name, last_name, age) |>  
+  dplyr::slice(1:10)
+```
+
+For substantive analyses, the type of profession is also interesting. `get_profession_groups()` takes a `data.frame` with information regarding the professional occupation, indicated in the `politicians` data table, and returns a `data.frame` with dummy variables indicating the profession per group (we defined 7 profession categories).
+
+```{r}
+get_profession_groups(politicians, "profession") |> 
+  dplyr::select(first_name, last_name, dplyr::starts_with("group_")) |> 
+  dplyr::slice(1:10) 
+```
+
+Additional parliamentary information is particularly interesting for users of the __Open Discourse__ database. The number of covered electoral terms can be obtained with `get_ets()`. If we are for instance interested in how many electoral terms famous politicians, e.g. _Angela Merkel_, have covered, we can compute it easily. 
+
+8 electoral terms, what a parliamentary career!
+
+```{r}
+speeches |> 
+  dplyr::filter(first_name == "Angela" & last_name == "Merkel") |> 
+  dplyr::mutate(electoral_term = as.numeric(electoral_term)) |> 
+  get_ets("electoral_term", merge = FALSE)
+```
+
+When investigating the background of politicians, the affiliated state (*Bundesland*) is politically of interest. State affiliations get be obtained with `get_state()`.
+
+```{r}
+get_state(
+  as.numeric(politicians$id), 
+  electoral_term = c(12, 17)
+) |> 
+  table()
+```
+
+For data visualization purposes (in party research), it is often desired or at least advised to use colors that match parties (or factions). `get_faction_color()` takes care fo that and yields hex color codes that can be used to visualize parties accordingly.
+
+```{r}
+get_faction_color(factions$abbreviation, id_type = "faction_name")
+```
+
+Ultimately, for research purposes, reporting up-to-date descriptive statistics is crucial. In articles, these are mostly reported in a _Table 1_ (also in [__Open Discourse__'s data paper](https://osf.io/preprints/socarxiv/dx87u/). `get_table_1()` takes care of that and generates an up-to-date _Table 1_.
+
+```{r, cache=T}
+table_1 <- get_table_1(
+  speeches,
+  contributions_simplified
+)
+
+table_1 |> 
+  kableExtra::kbl(caption = "Descriptive Statistics of Speeches and Contributions") |> 
+  kableExtra::kable_classic(full_width = F)
+```
+
