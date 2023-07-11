@@ -174,13 +174,6 @@ get_profession_groups <- function(data, var, merge = TRUE) {
 #' @export
 #'
 get_faction_color <- function(input_id, id_type = "number") {
-  faction_colors <- readr::read_csv(
-    system.file(
-      "data/faction_colors.csv",
-      package = "opendiscouRse"
-    )
-  ) %>%
-    suppressMessages()
   # faction_colors <- read.csv(
   #   system.file("data", "faction_colors.csv", package = "opendiscouRse")
   # )
