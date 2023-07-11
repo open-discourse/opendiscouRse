@@ -24,7 +24,7 @@ You can install the package with `devtools::install_github("open-discourse/opend
 - `get_age_hist()`: Get age of politician based on a historic date.
 - `get_ets()`: Get electoral term affiliations of politicians.
 - `get_profession_groups()`: Get professional group affiliation of politicians' jobs.
-- `get_faction:color()`: Get color code of factions.
+- `get_faction_color()`: Get color code of factions.
 - `get_state()`: Get state affiliation of elected politician (either list or direct mandate).
 - `get_table_1()`: Get main table (*Table 1*) with descriptive summaries of the database.
 - `get_implausible_data()`: Get data that is implausible based on specific data table based information.
