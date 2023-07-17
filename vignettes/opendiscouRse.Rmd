@@ -10,8 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>",
-  cache.lazy = FALSE
+  comment = "#>"
+  # cache.lazy = FALSE
 )
 ```
 
@@ -29,9 +29,9 @@ After configuring the database setup, we can obtain individual data tables from 
 od_obj <- OData$new()
 politicians <- od_obj$get_table_data("politicians")$data
 factions <- od_obj$get_table_data("factions")$data
-contributions_simplified <- od_obj$get_table_data("contributions_simplified")$data
+# contributions_simplified <- od_obj$get_table_data("contributions_simplified")$data
 # remove data-heavy variables for replication purposes
-speeches <- od_obj$get_table_data("speeches")$data |> dplyr::select(-c(speech_content, search_speech_content))
+# speeches <- od_obj$get_table_data("speeches")$data
 ```
 
 # Usage of functions
@@ -65,16 +65,16 @@ get_profession_groups(politicians, "profession") |>
   dplyr::slice(1:10) 
 ```
 
-Additional parliamentary information is particularly interesting for users of the __Open Discourse__ database. The number of covered electoral terms can be obtained with `get_ets()`. If we are for instance interested in how many electoral terms famous politicians, e.g. _Angela Merkel_, have covered, we can compute it easily. 
+<!-- Additional parliamentary information is particularly interesting for users of the __Open Discourse__ database. The number of covered electoral terms can be obtained with `get_ets()`. If we are for instance interested in how many electoral terms famous politicians, e.g. _Angela Merkel_, have covered, we can compute it easily.  -->
 
-8 electoral terms, what a parliamentary career!
+<!-- 8 electoral terms, what a parliamentary career! -->
 
-```{r}
-speeches |> 
-  dplyr::filter(first_name == "Angela" & last_name == "Merkel") |> 
-  dplyr::mutate(electoral_term = as.numeric(electoral_term)) |> 
-  get_ets("electoral_term", merge = FALSE)
-```
+<!-- ```{r} -->
+<!-- speeches |>  -->
+<!--   dplyr::filter(first_name == "Angela" & last_name == "Merkel") |>  -->
+<!--   dplyr::mutate(electoral_term = as.numeric(electoral_term)) |>  -->
+<!--   get_ets("electoral_term", merge = FALSE) -->
+<!-- ``` -->
 
 When investigating the background of politicians, the affiliated state (*Bundesland*) is politically of interest. State affiliations get be obtained with `get_state()`.
 
@@ -92,16 +92,23 @@ For data visualization purposes (in party research), it is often desired or at l
 get_faction_color(factions$abbreviation, id_type = "faction_name")
 ```
 
-Ultimately, for research purposes, reporting up-to-date descriptive statistics is crucial. In articles, these are mostly reported in a _Table 1_ (also in [__Open Discourse__'s data paper](https://osf.io/preprints/socarxiv/dx87u/). `get_table_1()` takes care of that and generates an up-to-date _Table 1_.
+<!-- Ultimately, for research purposes, reporting up-to-date descriptive statistics is crucial. In articles, these are mostly reported in a _Table 1_ (also in [__Open Discourse__'s data paper](https://osf.io/preprints/socarxiv/dx87u/). `get_table_1()` takes care of that and generates an up-to-date _Table 1_. -->
 
-```{r, cache=T}
-table_1 <- get_table_1(
-  speeches,
-  contributions_simplified
-)
+<!-- ```{r, cache=T} -->
+<!-- table_1 <- get_table_1( -->
+<!--   speeches, -->
+<!--   contributions_simplified -->
+<!-- ) -->
 
-table_1 |> 
-  kableExtra::kbl(caption = "Descriptive Statistics of Speeches and Contributions") |> 
-  kableExtra::kable_classic(full_width = F)
-```
+<!-- table_1 |>  -->
+<!--   kableExtra::kbl(caption = "Descriptive Statistics of Speeches and Contributions") |>  -->
+<!--   kableExtra::kable_classic(full_width = F) -->
+<!-- ``` -->
 
+## `count` functions
+
+TODO
+
+## `plot` functions
+
+TODO
