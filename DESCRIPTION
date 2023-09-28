@@ -26,8 +26,10 @@ Imports:
     dplyr,
     ggplot2,
     ggridges,
+    here,
     magrittr,
     purrr,
+    readr,
     rjson,
     stringr
 URL: https://open-discourse.github.io/opendiscouRse/

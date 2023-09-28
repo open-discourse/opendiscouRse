@@ -12,7 +12,6 @@ knitr::opts_chunk$set(
 
 ```{r setup, message=F, warning=F}
 library(opendiscouRse)
-library(tidyverse)
 ```
 
 # Database setup
@@ -23,7 +22,7 @@ After configuring the database setup, we can obtain individual data tables from 
 
 ```{r, cache=T, eval=F}
 # od_obj <- OData$new()
-# politicians <- od_obj$get_table_data("politicians")$data
+politicians <- od_obj$get_table_data("politicians")$data
 # factions <- od_obj$get_table_data("factions")$data
 # contributions_simplified <- od_obj$get_table_data("contributions_simplified")$data
 # remove data-heavy variables for replication purposes
@@ -31,7 +30,7 @@ After configuring the database setup, we can obtain individual data tables from 
 ```
 
 ```{r, echo=F, results='hide', message=F, warning=F}
-politicians <- read_csv(here::here("tests/testthat/data/politicians.csv"))
+politicians <- readr::read_csv(here::here("tests/testthat/data/politicians.csv"))
 ```
 
 
