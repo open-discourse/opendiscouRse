@@ -10,8 +10,8 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
-  # cache.lazy = FALSE
+  comment = "#>",
+  cache.lazy = FALSE
 )
 ```
 
@@ -25,14 +25,19 @@ For the integrated __Open Discourse__ database setup to work, you must set up da
 
 After configuring the database setup, we can obtain individual data tables from the `R6` class.
 
-```{r, cache=T}
-od_obj <- OData$new()
-politicians <- od_obj$get_table_data("politicians")$data
-factions <- od_obj$get_table_data("factions")$data
+```{r, cache=T, eval=F}
+# od_obj <- OData$new()
+# politicians <- od_obj$get_table_data("politicians")$data
+# factions <- od_obj$get_table_data("factions")$data
 # contributions_simplified <- od_obj$get_table_data("contributions_simplified")$data
 # remove data-heavy variables for replication purposes
 # speeches <- od_obj$get_table_data("speeches")$data
 ```
+
+```{r, echo=F, results='hide', message=F, warning=F}
+politicians <- readr::read_csv(here::here("tests/testthat/data/politicians.csv"))
+```
+
 
 # Usage of functions
 
@@ -88,9 +93,9 @@ get_state(
 
 For data visualization purposes (in party research), it is often desired or at least advised to use colors that match parties (or factions). `get_faction_color()` takes care fo that and yields hex color codes that can be used to visualize parties accordingly.
 
-```{r}
-get_faction_color(factions$abbreviation, id_type = "faction_name")
-```
+<!-- ```{r} -->
+<!-- get_faction_color(factions$abbreviation, id_type = "faction_name") -->
+<!-- ``` -->
 
 <!-- Ultimately, for research purposes, reporting up-to-date descriptive statistics is crucial. In articles, these are mostly reported in a _Table 1_ (also in [__Open Discourse__'s data paper](https://osf.io/preprints/socarxiv/dx87u/). `get_table_1()` takes care of that and generates an up-to-date _Table 1_. -->
 
