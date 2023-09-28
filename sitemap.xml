@@ -1,78 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>/404.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/404.html</loc>
   </url>
   <url>
-    <loc>/LICENSE-text.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/LICENSE-text.html</loc>
   </url>
   <url>
-    <loc>/LICENSE.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/LICENSE.html</loc>
   </url>
   <url>
-    <loc>/authors.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/articles/Introduction.html</loc>
   </url>
   <url>
-    <loc>/index.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/articles/index.html</loc>
   </url>
   <url>
-    <loc>/reference/OData.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/authors.html</loc>
   </url>
   <url>
-    <loc>/reference/OpenDiscourse.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/index.html</loc>
   </url>
   <url>
-    <loc>/reference/count_data.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/OData.html</loc>
   </url>
   <url>
-    <loc>/reference/dot-ets_pol_id.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/OpenDiscourse.html</loc>
   </url>
   <url>
-    <loc>/reference/dot-group_dummy_fun.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/count_data.html</loc>
   </url>
   <url>
-    <loc>/reference/get_age.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/dot-ets_pol_id.html</loc>
   </url>
   <url>
-    <loc>/reference/get_age_hist.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/dot-group_dummy_fun.html</loc>
   </url>
   <url>
-    <loc>/reference/get_ets.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/get_age.html</loc>
   </url>
   <url>
-    <loc>/reference/get_faction_color.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/get_age_hist.html</loc>
   </url>
   <url>
-    <loc>/reference/get_implausible_data.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/get_ets.html</loc>
   </url>
   <url>
-    <loc>/reference/get_profession_groups.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/get_faction_color.html</loc>
   </url>
   <url>
-    <loc>/reference/get_state.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/get_implausible_data.html</loc>
   </url>
   <url>
-    <loc>/reference/get_table_1.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/get_profession_groups.html</loc>
   </url>
   <url>
-    <loc>/reference/index.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/get_state.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_count.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/get_table_1.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_cov.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/index.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_dist.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/plot_count.html</loc>
   </url>
   <url>
-    <loc>/reference/plot_rel_freq.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/plot_cov.html</loc>
   </url>
   <url>
-    <loc>/reference/rel_freq_data.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/plot_dist.html</loc>
   </url>
   <url>
-    <loc>/reference/theme_od.html</loc>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/plot_rel_freq.html</loc>
+  </url>
+  <url>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/rel_freq_data.html</loc>
+  </url>
+  <url>
+    <loc>https://open-discourse.github.io/opendiscouRse/reference/theme_od.html</loc>
   </url>
 </urlset>

@@ -1,6 +1,10 @@
 pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
-articles: {}
-last_built: 2023-07-11T13:02Z
+articles:
+  Introduction: Introduction.html
+last_built: 2023-09-28T12:53Z
+urls:
+  reference: https://open-discourse.github.io/opendiscouRse/reference
+  article: https://open-discourse.github.io/opendiscouRse/articles
 
