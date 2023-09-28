@@ -77,6 +77,8 @@
 
     
     
+<p>This short demonstration introduces some elementary capabilities of
+the R package <a href="https://github.com/open-discourse/opendiscouRse" class="external-link"><code>opendiscouRse</code></a>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://open-discourse.github.io/opendiscouRse/">opendiscouRse</a></span><span class="op">)</span></span></code></pre></div>
 <div class="section level2">
@@ -87,18 +89,39 @@ work, you must set up database the database locally, e.g. by using
 Docker, as <a href="https://github.com/open-discourse/open-discourse#docker-setup" class="external-link">described
 here</a>.</p>
 <p>After configuring the database setup, we can obtain individual data
-tables from the <code>R6</code> class.</p>
+tables from the <code>R6</code> class. In the following, we select the
+<code>politicians</code> table.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># od_obj &lt;- OData$new()</span></span>
-<span><span class="va">politicians</span> <span class="op">&lt;-</span> <span class="va">od_obj</span><span class="op">$</span><span class="fu">get_table_data</span><span class="op">(</span><span class="st">"politicians"</span><span class="op">)</span><span class="op">$</span><span class="va">data</span></span>
-<span><span class="co"># factions &lt;- od_obj$get_table_data("factions")$data</span></span>
-<span><span class="co"># contributions_simplified &lt;- od_obj$get_table_data("contributions_simplified")$data</span></span>
-<span><span class="co"># remove data-heavy variables for replication purposes</span></span>
-<span><span class="co"># speeches &lt;- od_obj$get_table_data("speeches")$data</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">od_obj</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/OData.html">OData</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">politicians</span> <span class="op">&lt;-</span> <span class="va">od_obj</span><span class="op">$</span><span class="fu">get_table_data</span><span class="op">(</span><span class="st">"politicians"</span><span class="op">)</span><span class="op">$</span><span class="va">data</span></span></code></pre></div>
 </div>
 <div class="section level2">
 <h2 id="usage-of-functions">Usage of functions<a class="anchor" aria-label="anchor" href="#usage-of-functions"></a>
 </h2>
+<div class="section level3">
+<h3 id="count-functions">
+<code>count</code> functions<a class="anchor" aria-label="anchor" href="#count-functions"></a>
+</h3>
+<div class="section level4">
+<h4 id="count_data">
+<code>count_data()</code><a class="anchor" aria-label="anchor" href="#count_data"></a>
+</h4>
+<p>For simple data aggregations, we can use <code><a href="../reference/count_data.html">count_data()</a></code> to
+descriptively analyze the database. As we can see, the majority of
+distinct politicians holding speeches in the Bundestag are men.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">politicians</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/count_data.html">count_data</a></span><span class="op">(</span>grouping_vars <span class="op">=</span> <span class="st">"gender"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 3 × 2</span></span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># Groups:   gender [3]</span></span></span>
+<span><span class="co">#&gt;   gender       n</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> männlich  <span style="text-decoration: underline;">3</span>391</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> weiblich   975</span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> <span style="color: #BB0000;">NA</span>          20</span></span></code></pre></div>
+<p><br></p>
+</div>
+</div>
 <div class="section level3">
 <h3 id="get-functions">
 <code>get</code> functions<a class="anchor" aria-label="anchor" href="#get-functions"></a>
@@ -107,9 +130,10 @@ tables from the <code>R6</code> class.</p>
 <h4 id="get_age">
 <code>get_age()</code><a class="anchor" aria-label="anchor" href="#get_age"></a>
 </h4>
+<p>Let’s move to generating new columns!</p>
 <p>With the <code><a href="../reference/get_age.html">get_age()</a></code> function, we can easily calculate the
 age of politicians.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">politicians</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    age <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span></span>
@@ -141,7 +165,7 @@ with information regarding the professional occupation, indicated in the
 <code>politicians</code> data table, and returns a
 <code>data.frame</code> with dummy variables indicating the profession
 per group (we defined 7 profession categories).</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_profession_groups.html">get_profession_groups</a></span><span class="op">(</span><span class="va">politicians</span>, <span class="st">"profession"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">first_name</span>, <span class="va">last_name</span>, <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyselect.r-lib.org/reference/starts_with.html" class="external-link">starts_with</a></span><span class="op">(</span><span class="st">"group_"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/slice.html" class="external-link">slice</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span> </span>
@@ -168,10 +192,11 @@ per group (we defined 7 profession categories).</p>
 <!--   dplyr::mutate(electoral_term = as.numeric(electoral_term)) |>  -->
 <!--   get_ets("electoral_term", merge = FALSE) -->
 <!-- ``` -->
+<p><br></p>
 <p>When investigating the background of politicians, the affiliated
 state (<em>Bundesland</em>) is politically of interest. State
 affiliations get be obtained with <code><a href="../reference/get_state.html">get_state()</a></code>.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/get_state.html">get_state</a></span><span class="op">(</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">politicians</span><span class="op">$</span><span class="va">id</span><span class="op">)</span>, </span>
 <span>  electoral_term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">12</span>, <span class="fl">17</span><span class="op">)</span></span>
@@ -190,14 +215,29 @@ affiliations get be obtained with <code><a href="../reference/get_state.html">ge
 <span><span class="co">#&gt;                     35                     20                     26 </span></span>
 <span><span class="co">#&gt;              Thüringen </span></span>
 <span><span class="co">#&gt;                     22</span></span></code></pre></div>
+<p><br></p>
 <p>For data visualization purposes (in party research), it is often
 desired or at least advised to use colors that match parties (or
 factions). <code><a href="../reference/get_faction_color.html">get_faction_color()</a></code> takes care fo that and
 yields hex color codes that can be used to visualize parties
 accordingly.</p>
-<!-- ```{r} -->
-<!-- get_faction_color(factions$abbreviation, id_type = "faction_name") -->
-<!-- ``` -->
+<p>For that, we need to get a distinctive indication of political groups
+acting in the Bundestag. Let’s load the <code>factions</code> table.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">od_obj</span> <span class="op">&lt;-</span> <span class="va"><a href="../reference/OData.html">OData</a></span><span class="op">$</span><span class="fu">new</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">factions</span> <span class="op">&lt;-</span> <span class="va">od_obj</span><span class="op">$</span><span class="fu">get_table_data</span><span class="op">(</span><span class="st">"factions"</span><span class="op">)</span><span class="op">$</span><span class="va">data</span></span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/get_faction_color.html">get_faction_color</a></span><span class="op">(</span><span class="va">factions</span><span class="op">$</span><span class="va">abbreviation</span>, id_type <span class="op">=</span> <span class="st">"faction_name"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;         &lt;NA&gt;          AfD          BHE           BP        Grüne      CDU/CSU </span></span>
+<span><span class="co">#&gt;           NA    "#009EE0"    "#C3C318"    "#386ABC"    "#64A12D"    "#000000" </span></span>
+<span><span class="co">#&gt;           DA   DIE LINKE.           DP       DP/DBP       DP/FVP          DPB </span></span>
+<span><span class="co">#&gt;    "#000000"    "#BE3075"    "#63B8FF"    "#63B8FF"    "#63B8FF"           NA </span></span>
+<span><span class="co">#&gt;          DRP       DRP/NR          FDP           FU          FVP Fraktionslos </span></span>
+<span><span class="co">#&gt;    "#8b4726"    "#8b4726"    "#FFEE00"           NA    "#FFEE00"           NA </span></span>
+<span><span class="co">#&gt;       GB/BHE         Gast           KO          KPD           NR          PDS </span></span>
+<span><span class="co">#&gt;    "#C3C318"           NA           NA    "#8B0000"    "#8b4726"    "#BE3075" </span></span>
+<span><span class="co">#&gt;          SPD          SSW          WAV            Z </span></span>
+<span><span class="co">#&gt;    "#EB001F"    "#003C8F"    "#FFEC8B"    "#0000CD"</span></span></code></pre></div>
 <!-- Ultimately, for research purposes, reporting up-to-date descriptive statistics is crucial. In articles, these are mostly reported in a _Table 1_ (also in [__Open Discourse__'s data paper](https://osf.io/preprints/socarxiv/dx87u/). `get_table_1()` takes care of that and generates an up-to-date _Table 1_. -->
 <!-- ```{r, cache=T} -->
 <!-- table_1 <- get_table_1( -->
@@ -208,19 +248,48 @@ accordingly.</p>
 <!--   kableExtra::kbl(caption = "Descriptive Statistics of Speeches and Contributions") |>  -->
 <!--   kableExtra::kable_classic(full_width = F) -->
 <!-- ``` -->
+<p><br></p>
 </div>
-</div>
-<div class="section level3">
-<h3 id="count-functions">
-<code>count</code> functions<a class="anchor" aria-label="anchor" href="#count-functions"></a>
-</h3>
-<p>TODO</p>
 </div>
 <div class="section level3">
 <h3 id="plot-functions">
 <code>plot</code> functions<a class="anchor" aria-label="anchor" href="#plot-functions"></a>
 </h3>
-<p>TODO</p>
+<div class="section level4">
+<h4 id="plot_cov">
+<code>plot_cov()</code><a class="anchor" aria-label="anchor" href="#plot_cov"></a>
+</h4>
+<p>The package comes with several plotting functions. For descriptive
+purposes, we might be interested in the coverage of the data table.
+<code><a href="../reference/plot_cov.html">plot_cov()</a></code> visualizes <code>NAs</code> for the whole table.
+Of course, there is a <code>ggplot2</code> <strong>Open
+Discourse</strong> theme.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_cov.html">plot_cov</a></span><span class="op">(</span><span class="va">politicians</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_od.html">theme_od</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Introduction_files/figure-html/unnamed-chunk-10-1.png" width="700"></p>
+<p><br></p>
+</div>
+<div class="section level4">
+<h4 id="plot_count">
+<code>plot_count()</code><a class="anchor" aria-label="anchor" href="#plot_count"></a>
+</h4>
+<p>As shown above, <code><a href="../reference/count_data.html">count_data()</a></code> computes counts per
+grouping variables. <code><a href="../reference/plot_count.html">plot_count()</a></code> builds on that and is able
+to visualize this type of counted data specifically. If we also
+incorporate the Bundesland (state) affiliation through
+<code><a href="../reference/get_state.html">get_state()</a></code>, we can show how the distribution of gender
+across states looks like.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">politicians</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>state <span class="op">=</span> <span class="fu"><a href="../reference/get_state.html">get_state</a></span><span class="op">(</span><span class="va">id</span>, electoral_term <span class="op">=</span> <span class="fl">19</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">state</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="../reference/count_data.html">count_data</a></span><span class="op">(</span>grouping_vars <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"state"</span>, <span class="st">"gender"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/plot_count.html">plot_count</a></span><span class="op">(</span>x_var <span class="op">=</span> <span class="st">"gender"</span>, facet_var <span class="op">=</span> <span class="st">"state"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="../reference/theme_od.html">theme_od</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">ggtitle</a></span><span class="op">(</span><span class="st">"Gender of Parliamentary Speakers by State in the 19. Bundestag"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="Introduction_files/figure-html/unnamed-chunk-11-1.png" width="700"></p>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc"><h2>On this page</h2>
