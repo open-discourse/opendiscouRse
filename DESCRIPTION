@@ -31,6 +31,7 @@ Imports:
     purrr,
     readr,
     rjson,
-    stringr
+    stringr,
+    tidyr
 URL: https://open-discourse.github.io/opendiscouRse/
 VignetteBuilder: knitr
