@@ -14,6 +14,8 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.0
 Suggests: 
+    knitr,
+    rmarkdown,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Depends: 
@@ -29,3 +31,4 @@ Imports:
     rjson,
     stringr
 URL: https://open-discourse.github.io/opendiscouRse/
+VignetteBuilder: knitr
