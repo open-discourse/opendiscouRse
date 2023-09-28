@@ -10,6 +10,8 @@ knitr::opts_chunk$set(
 )
 ```
 
+This short demonstration introduces some elementary capabilities of the R package [`opendiscouRse`](https://github.com/open-discourse/opendiscouRse).
+
 ```{r setup, message=F, warning=F}
 library(opendiscouRse)
 ```
@@ -18,27 +20,39 @@ library(opendiscouRse)
 
 For the integrated __Open Discourse__ database setup to work, you must set up database the database locally, e.g. by using Docker, as [described here](https://github.com/open-discourse/open-discourse#docker-setup).
 
-After configuring the database setup, we can obtain individual data tables from the `R6` class.
+After configuring the database setup, we can obtain individual data tables from the `R6` class. In the following, we select the `politicians` table.
 
 ```{r, cache=T, eval=F}
-# od_obj <- OData$new()
+od_obj <- OData$new()
 politicians <- od_obj$get_table_data("politicians")$data
-# factions <- od_obj$get_table_data("factions")$data
-# contributions_simplified <- od_obj$get_table_data("contributions_simplified")$data
-# remove data-heavy variables for replication purposes
-# speeches <- od_obj$get_table_data("speeches")$data
 ```
 
 ```{r, echo=F, results='hide', message=F, warning=F}
 politicians <- readr::read_csv(here::here("tests/testthat/data/politicians.csv"))
+factions <- readr::read_csv(here::here("tests/testthat/data/factions.csv"))
 ```
 
 
 # Usage of functions
 
+## `count` functions
+
+### `count_data()`
+
+For simple data aggregations, we can use `count_data()` to descriptively analyze the database. As we can see, the majority of distinct politicians holding speeches in the Bundestag are men.
+
+```{r}
+politicians |> 
+  count_data(grouping_vars = "gender")
+```
+
+\
+
 ## `get` functions
 
 ### `get_age()`
+
+Let's move to generating new columns!
 
 With the `get_age()` function, we can easily calculate the age of politicians.
 
@@ -76,6 +90,8 @@ get_profession_groups(politicians, "profession") |>
 <!--   get_ets("electoral_term", merge = FALSE) -->
 <!-- ``` -->
 
+\
+
 When investigating the background of politicians, the affiliated state (*Bundesland*) is politically of interest. State affiliations get be obtained with `get_state()`.
 
 ```{r}
@@ -86,11 +102,20 @@ get_state(
   table()
 ```
 
+\
+
 For data visualization purposes (in party research), it is often desired or at least advised to use colors that match parties (or factions). `get_faction_color()` takes care fo that and yields hex color codes that can be used to visualize parties accordingly.
 
-<!-- ```{r} -->
-<!-- get_faction_color(factions$abbreviation, id_type = "faction_name") -->
-<!-- ``` -->
+For that, we need to get a distinctive indication of political groups acting in the Bundestag. Let's load the `factions` table.
+
+```{r, cache=T, eval=F}
+od_obj <- OData$new()
+factions <- od_obj$get_table_data("factions")$data
+```
+
+```{r}
+get_faction_color(factions$abbreviation, id_type = "faction_name")
+```
 
 <!-- Ultimately, for research purposes, reporting up-to-date descriptive statistics is crucial. In articles, these are mostly reported in a _Table 1_ (also in [__Open Discourse__'s data paper](https://osf.io/preprints/socarxiv/dx87u/). `get_table_1()` takes care of that and generates an up-to-date _Table 1_. -->
 
@@ -105,10 +130,32 @@ For data visualization purposes (in party research), it is often desired or at l
 <!--   kableExtra::kable_classic(full_width = F) -->
 <!-- ``` -->
 
-## `count` functions
-
-TODO
+\
 
 ## `plot` functions
 
-TODO
+### `plot_cov()`
+
+The package comes with several plotting functions. For descriptive purposes, we might be interested in the coverage of the data table. `plot_cov()` visualizes `NAs` for the whole table. Of course, there is a `ggplot2` __Open Discourse__ theme.
+
+```{r}
+plot_cov(politicians) +
+  theme_od()
+```
+
+\
+
+### `plot_count()`
+
+As shown above, `count_data()` computes counts per grouping variables. `plot_count()` builds on that and is able to visualize this type of counted data specifically. If we also incorporate the Bundesland (state) affiliation through `get_state()`, we can show how the distribution of gender across states looks like.
+
+```{r}
+politicians |> 
+  dplyr::mutate(state = get_state(id, electoral_term = 19)) |> 
+  dplyr::filter(!is.na(state)) |> 
+  count_data(grouping_vars = c("state", "gender")) |>
+  plot_count(x_var = "gender", facet_var = "state") +
+  theme_od() + 
+  ggplot2::ggtitle("Gender of Parliamentary Speakers by State in the 19. Bundestag")
+```
+
