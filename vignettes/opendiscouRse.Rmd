@@ -16,6 +16,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
+library(tidyverse)
 library(opendiscouRse)
 ```
 
@@ -35,7 +36,7 @@ After configuring the database setup, we can obtain individual data tables from 
 ```
 
 ```{r, echo=F, results='hide', message=F, warning=F}
-politicians <- readr::read_csv(here::here("tests/testthat/data/politicians.csv"))
+politicians <- read_csv(here::here("tests/testthat/data/politicians.csv"))
 ```
 
 
